@@ -1255,6 +1255,31 @@ body::after {
   flex-shrink: 0;
 }
 .skc-del:hover { background: #ff8b6b; }
+.skc-edit {
+  border: none;
+  background: var(--cyan);
+  color: var(--ink);
+  font-family: "Space Grotesk", "Noto Sans SC", sans-serif;
+  font-weight: 700;
+  font-size: 12px;
+  line-height: 1;
+  padding: 3px 6px;
+  border-radius: 5px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.skc-edit:hover { background: #9ee5f5; }
+.skc-edit-input {
+  flex: 1;
+  min-width: 0;
+  font-family: "Space Grotesk", "Noto Sans SC", monospace;
+  font-weight: 700;
+  font-size: 14px;
+  border: 2px solid var(--ink);
+  border-radius: 5px;
+  padding: 4px 6px;
+  box-sizing: border-box;
+}
 
 /* ===== 页脚 ===== */
 .footer {
@@ -1280,4 +1305,38 @@ body::after {
   .skc-board { grid-template-columns: 1fr 1fr; }
   .topbar { flex-direction: column; align-items: stretch; }
   .topbar-actions { text-align: right; }
+}
+
+/* ===== 打印友好视图（A4 / 导出 PDF） ===== */
+@media print {
+  /* 隐藏装饰与交互元素 */
+  .noise, .noise-coarse, .bg-shapes,
+  .topbar-actions, .skc-add, .skc-hint,
+  .skc-edit, .skc-del, .skc-more,
+  .install-pulse, .footer, .topbar-clock { display: none !important; }
+
+  html, body {
+    background: #fff !important;
+    color: #000 !important;
+  }
+  body { padding: 0 !important; }
+  .layout { display: block !important; }
+  .panel {
+    box-shadow: none !important;
+    border: 1px solid #000 !important;
+    border-radius: 0 !important;
+    margin-bottom: 14px !important;
+    break-inside: avoid;
+  }
+  .panel-head h2 { font-size: 16px !important; }
+  /* 结果区重点数值保留，去掉粗野阴影 */
+  .rc-feature { box-shadow: none !important; }
+  /* SKC 表：四列平铺，去掉虚线/圆角，适配 A4 宽度 */
+  .skc-board { grid-template-columns: repeat(4, 1fr) !important; gap: 8px !important; }
+  .skc-col { box-shadow: none !important; border: 1px solid #000 !important; border-radius: 0 !important; }
+  .skc-chip { box-shadow: none !important; border: 1px solid #999 !important; }
+  .skc-price { background: #eee !important; color: #000 !important; }
+  /* 让链接/背景图等不打印 */
+  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  @page { margin: 12mm; }
 }
