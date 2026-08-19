@@ -33,25 +33,56 @@ body {
   line-height: 1.55;
 }
 
-/* 噪点纹理叠加，强化粗野质感 */
+/* ===== 噪点纹理（细颗粒层） ===== */
 .noise {
   position: fixed;
   inset: 0;
   pointer-events: none;
   z-index: 0;
-  opacity: 0.05;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  opacity: 0.09;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.4' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  mix-blend-mode: multiply;
 }
 
-/* ===== 点阵网格底纹 ===== */
+/* ===== 粗砂纸纹理（第二层噪点，大颗粒） ===== */
+.noise-coarse {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.05;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='nc'%3E%3CfeTurbulence type='turbulence' baseFrequency='0.35' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23nc)'/%3E%3C/svg%3E");
+  mix-blend-mode: multiply;
+}
+
+/* ===== 半调网点 + 对角交叉线底纹 ===== */
 body::before {
   content: "";
   position: fixed;
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  background-image: radial-gradient(circle, rgba(10,10,10,0.06) 1.5px, transparent 1.5px);
-  background-size: 38px 38px;
+  background-image:
+    /* 大网点 */
+    radial-gradient(circle, rgba(10,10,10,0.09) 1.6px, transparent 1.8px),
+    /* 小网点（偏移） */
+    radial-gradient(circle, rgba(10,10,10,0.05) 1px, transparent 1.2px),
+    /* 对角细线 45° */
+    repeating-linear-gradient(45deg, transparent 0 80px, rgba(10,10,10,0.025) 80px 81px),
+    /* 对角细线 -45° */
+    repeating-linear-gradient(-45deg, transparent 0 80px, rgba(10,10,10,0.025) 80px 81px);
+  background-size: 42px 42px, 21px 21px, auto, auto;
+  background-position: 0 0, 10px 10px, 0 0, 0 0;
+}
+
+/* ===== 暗角晕影（边缘微暗，增加纵深） ===== */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse 90% 80% at center, transparent 55%, rgba(10,10,10,0.07) 100%);
 }
 
 /* ===== 漂浮几何图形 ===== */
@@ -65,7 +96,7 @@ body::before {
 
 .shape {
   position: absolute;
-  opacity: 0.09;
+  opacity: 0.12;
   will-change: transform;
 }
 
@@ -101,7 +132,7 @@ body::before {
   border-left: 55px solid transparent;
   border-right: 55px solid transparent;
   border-bottom: 95px solid var(--coral);
-  opacity: 0.08;
+  opacity: 0.11;
   animation: floatC 28s ease-in-out infinite;
 }
 
@@ -111,7 +142,7 @@ body::before {
   right: 3%;
   width: 70px;
   height: 70px;
-  opacity: 0.07;
+  opacity: 0.10;
   animation: floatD 26s ease-in-out infinite;
 }
 .s-cross::before,
@@ -141,7 +172,7 @@ body::before {
   right: 8%;
   width: 100px;
   height: 100px;
-  opacity: 0.06;
+  opacity: 0.09;
   background-image:
     linear-gradient(var(--ink) 8px, transparent 8px),
     linear-gradient(90deg, var(--ink) 8px, transparent 8px);
@@ -155,7 +186,7 @@ body::before {
   left: 2%;
   width: 80px;
   height: 80px;
-  opacity: 0.06;
+  opacity: 0.09;
   background: var(--purple);
   clip-path: polygon(0 20%, 50% 0, 50% 40%, 100% 20%, 100% 60%, 50% 40%, 50% 80%, 0 100%, 0 60%, 50% 40%, 50% 0);
   animation: floatB 34s ease-in-out infinite reverse;
