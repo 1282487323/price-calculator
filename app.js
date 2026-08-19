@@ -18,6 +18,58 @@ function num(v) {
   return Number.isFinite(n) ? n : 0;
 }
 
+// ===== 本地持久化（localStorage）：刷新/关闭后再开数据不丢 =====
+const STORAGE_KEY = "price-calc-state-v1";
+
+function saveState() {
+  try {
+    const state = {
+      inputs: {
+        price: document.getElementById("in-price").value,
+        origin: document.getElementById("in-origin").value,
+        deduct: document.getElementById("in-deduct").value,
+        rate: document.getElementById("in-rate").value,
+        sub: document.getElementById("in-sub").value,
+      },
+      toggles: {
+        b7b8: document.getElementById("toggle-b7b8").checked,
+        a1b1: document.getElementById("toggle-a1b1").checked,
+      },
+      skc: skcList,
+      history: histList,
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  } catch (e) { /* 隐私模式 / 存储不可用：静默忽略 */ }
+}
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return false;
+    const s = JSON.parse(raw);
+    if (s.inputs) {
+      document.getElementById("in-price").value = s.inputs.price ?? "";
+      document.getElementById("in-origin").value = s.inputs.origin ?? "";
+      document.getElementById("in-deduct").value = s.inputs.deduct ?? "";
+      document.getElementById("in-rate").value = s.inputs.rate ?? "";
+      document.getElementById("in-sub").value = s.inputs.sub ?? "";
+    }
+    if (s.toggles) {
+      document.getElementById("toggle-b7b8").checked = !!s.toggles.b7b8;
+      document.getElementById("toggle-a1b1").checked = !!s.toggles.a1b1;
+    }
+    if (Array.isArray(s.skc)) {
+      skcList.length = 0;
+      s.skc.forEach((it) => skcList.push(it));
+    }
+    if (Array.isArray(s.history)) {
+      histList.length = 0;
+      s.history.forEach((it) => histList.push(it));
+    }
+    return true;
+  } catch (e) { return false; }
+}
+
 // 精确小数显示：去掉多余尾零，最多保留 maxDp 位
 function fmt(n, maxDp = 4) {
   if (!Number.isFinite(n)) return "—";
@@ -110,6 +162,7 @@ function calculate(toHistory = false) {
     clearTimeout(recordHistory._t);
     // 即便输入价/原定价为空，也要刷新 SKC 表头（减几已变时立即联动）
     renderSkc();
+    saveState();
     return;
   }
 
@@ -142,6 +195,7 @@ function calculate(toHistory = false) {
   if (toHistory) {
     recordHistory({ b2: B2, b4: B4, a1: A1, b1: B1, e3: E3, b5: B5, b6: B6, b9: B9, b10: B10 });
   }
+  saveState();
 }
 
 // 活动状态标签渲染：报活动时拆为 两段小贴纸（加N / 减N）；不报活动 = 黑底白字
@@ -177,6 +231,7 @@ function resetDefaults() {
   document.getElementById("in-rate").value = DEFAULTS.rate;
 
   resetOutputs();
+  saveState();
 }
 
 // ===== 顶栏实时时钟 =====
@@ -225,6 +280,7 @@ function applyToggle() {
   const showA1B1 = document.getElementById("toggle-a1b1").checked;
   document.getElementById("card-a1").style.display = showA1B1 ? "" : "none";
   document.getElementById("card-b1").style.display = showA1B1 ? "" : "none";
+  saveState();
 }
 
 /* =========================================================
@@ -249,6 +305,7 @@ function recordHistory(p) {
     if (histList.length > HIST_MAX) histList = histList.slice(0, HIST_MAX);
     histNewId = entry.ts;
     renderHistory();
+    saveState();
   }, 600);
 }
 
@@ -324,6 +381,7 @@ function clearHistory() {
   if (histList.length === 0) return;
   histList = [];
   renderHistory();
+  saveState();
 }
 
 /* =========================================================
@@ -351,46 +409,77 @@ function b9ToCol(b9) {
   return 3; // 不报活动
 }
 
-// 添加一条 SKC（只录入编码；锁定添加时的全部参数）
+// 添加一条 SKC 的核心逻辑（只录入编码；锁定添加时的全部参数）
+// 返回 { ok:true } 或 { ok:false, reason, b5? }
+// 供单条录入（addSkc）与批量粘贴（importSkcBulk）复用
+function addOneSkc(code) {
+  const { B2, B4, A1, B1, E3 } = getParams();
+  if (!(B2 > 0) || !(B4 > 0)) return { ok: false, reason: "noparams" };
+  // 重复值提醒：code 已存在（无论它在四列中的哪一列）→ 拒绝
+  if (skcList.some((s) => s.code === code)) return { ok: false, reason: "dup" };
+  // 低于原定价拒绝：当前参数下 B5<0 时不允许添加
+  const r = compute(B2, B4, A1, B1, E3);
+  if (r.B5 < 0) return { ok: false, reason: "neg", b5: r.B5 };
+  skcList.push({ code, b2: B2, b4: B4, a1: A1, b1: B1, e3: E3 });
+  return { ok: true };
+}
+
+// 单条添加（绑定「＋ 添加」按钮 / 回车）
 function addSkc() {
   const code = document.getElementById("skc-code").value.trim();
-
   if (!code) {
     alert("请先填写 SKC 编码");
     return;
   }
-  const { B2, B4, A1, B1, E3 } = getParams();
-  if (!(B2 > 0) || !(B4 > 0)) {
-    alert("请先在上方「输入参数」填好「输入价格」和「原定价」");
-    return;
-  }
-
-  // 1) 重复值提醒：code 已存在（无论它在四列中的哪一列）→ 拒绝
-  if (skcList.some((s) => s.code === code)) {
-    alert("SKC 编码【" + code + "】已经添加过，请勿重复录入");
+  const res = addOneSkc(code);
+  if (!res.ok) {
+    if (res.reason === "noparams") {
+      alert("请先在上方「输入参数」填好「输入价格」和「原定价」");
+    } else if (res.reason === "dup") {
+      alert("SKC 编码【" + code + "】已经添加过，请勿重复录入");
+    } else if (res.reason === "neg") {
+      alert("差价低于原定价（B5 = " + fmt(res.b5) + "），无法添加 SKC。请调整输入参数后重试");
+    }
     document.getElementById("skc-code").focus();
     return;
   }
-
-  // 2) 低于原定价拒绝：当前参数下 B5<0 时不允许添加
-  const r = compute(B2, B4, A1, B1, E3);
-  if (r.B5 < 0) {
-    alert("差价低于原定价（B5 = " + fmt(r.B5) + "），无法添加 SKC。请调整输入参数后重试");
-    return;
-  }
-
-  // 锁定：本次添加瞬间的全部参数快照，后续用户改动参数不影响本条
-  skcList.push({ code, b2: B2, b4: B4, a1: A1, b1: B1, e3: E3 });
   document.getElementById("skc-code").value = "";
   document.getElementById("skc-code").focus();
-
   renderSkc();
+  saveState();
+}
+
+// 批量粘贴：按 换行/逗号/空格 拆分，逐个校验并添加，返回结果统计
+function importSkcBulk(text) {
+  const codes = (text || "")
+    .split(/[\n,，\s]+/)
+    .map((s) => s.trim())
+    .filter(Boolean);
+  let added = 0, dup = 0, neg = 0, noparams = false;
+  codes.forEach((code) => {
+    const res = addOneSkc(code);
+    if (res.ok) added++;
+    else if (res.reason === "dup") dup++;
+    else if (res.reason === "neg") neg++;
+    else if (res.reason === "noparams") noparams = true;
+  });
+  renderSkc();
+  saveState();
+  if (added > 0 || dup > 0 || neg > 0) {
+    let msg = "导入完成：成功 " + added + " 条";
+    if (dup) msg += "，重复跳过 " + dup + " 条";
+    if (neg) msg += "，低于原定价跳过 " + neg + " 条";
+    if (noparams) msg += "（部分因未填输入价格/原定价被跳过）";
+    return msg;
+  }
+  return noparams ? "请先填好输入价格/原定价再导入" : "没有可导入的有效编码";
 }
 
 // 删除一条 SKC
 function removeSkc(i) {
   skcList.splice(i, 1);
   renderSkc();
+  saveState();
 }
 
 // 一键清空所有 SKC（带确认）
@@ -402,6 +491,7 @@ function clearAllSkc() {
   if (!confirm("确定要清空全部 " + skcList.length + " 条 SKC 吗？此操作不可撤销")) return;
   skcList.length = 0;
   renderSkc();
+  saveState();
 }
 
 // SKC 面板放大/缩小：放大=显示全部；缩小=每列只显示前 SKC_COLLAPSED_MAX 个
@@ -583,10 +673,31 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("skcClearBtn").addEventListener("click", clearAllSkc);
   // SKC 放大/缩小切换
   document.getElementById("skcExpandBtn").addEventListener("click", toggleSkcExpand);
+  // SKC 批量粘贴面板开关
+  const bulkPanel = document.getElementById("skcBulkPanel");
+  document.getElementById("skcBulkBtn").addEventListener("click", () => {
+    bulkPanel.hidden = !bulkPanel.hidden;
+    if (!bulkPanel.hidden) document.getElementById("skcBulkText").focus();
+  });
+  document.getElementById("skcBulkCancelBtn").addEventListener("click", () => {
+    bulkPanel.hidden = true;
+    document.getElementById("skcBulkText").value = "";
+    document.getElementById("skcBulkMsg").textContent = "";
+  });
+  document.getElementById("skcBulkImportBtn").addEventListener("click", () => {
+    const msg = importSkcBulk(document.getElementById("skcBulkText").value);
+    const msgEl = document.getElementById("skcBulkMsg");
+    msgEl.textContent = msg;
+    if (msg.startsWith("导入完成")) {
+      document.getElementById("skcBulkText").value = "";
+      setTimeout(() => { bulkPanel.hidden = true; msgEl.textContent = ""; }, 1800);
+    }
+  });
   // 历史：清空按钮
   document.getElementById("histClearBtn").addEventListener("click", clearHistory);
-  applyToggle();
-  resetOutputs();
+  loadState();        // 先恢复上次保存的输入/开关/SKC/历史
+  applyToggle();      // 再按恢复的开关态刷新卡片显隐
+  calculate(false);   // 用恢复后的参数渲染结果与 SKC 表头
   renderSkc();
   renderHistory();
   // 启动实时时钟
