@@ -411,7 +411,7 @@ function b9ToCol(b9) {
 
 // 添加一条 SKC 的核心逻辑（只录入编码；锁定添加时的全部参数）
 // 返回 { ok:true } 或 { ok:false, reason, b5? }
-// 供单条录入（addSkc）与批量粘贴（importSkcBulk）复用
+// 供单条录入（addSkc）复用
 function addOneSkc(code) {
   const { B2, B4, A1, B1, E3 } = getParams();
   if (!(B2 > 0) || !(B4 > 0)) return { ok: false, reason: "noparams" };
@@ -447,32 +447,6 @@ function addSkc() {
   document.getElementById("skc-code").focus();
   renderSkc();
   saveState();
-}
-
-// 批量粘贴：按 换行/逗号/空格 拆分，逐个校验并添加，返回结果统计
-function importSkcBulk(text) {
-  const codes = (text || "")
-    .split(/[\n,，\s]+/)
-    .map((s) => s.trim())
-    .filter(Boolean);
-  let added = 0, dup = 0, neg = 0, noparams = false;
-  codes.forEach((code) => {
-    const res = addOneSkc(code);
-    if (res.ok) added++;
-    else if (res.reason === "dup") dup++;
-    else if (res.reason === "neg") neg++;
-    else if (res.reason === "noparams") noparams = true;
-  });
-  renderSkc();
-  saveState();
-  if (added > 0 || dup > 0 || neg > 0) {
-    let msg = "导入完成：成功 " + added + " 条";
-    if (dup) msg += "，重复跳过 " + dup + " 条";
-    if (neg) msg += "，低于原定价跳过 " + neg + " 条";
-    if (noparams) msg += "（部分因未填输入价格/原定价被跳过）";
-    return msg;
-  }
-  return noparams ? "请先填好输入价格/原定价再导入" : "没有可导入的有效编码";
 }
 
 // 删除一条 SKC
@@ -673,26 +647,6 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("skcClearBtn").addEventListener("click", clearAllSkc);
   // SKC 放大/缩小切换
   document.getElementById("skcExpandBtn").addEventListener("click", toggleSkcExpand);
-  // SKC 批量粘贴面板开关
-  const bulkPanel = document.getElementById("skcBulkPanel");
-  document.getElementById("skcBulkBtn").addEventListener("click", () => {
-    bulkPanel.hidden = !bulkPanel.hidden;
-    if (!bulkPanel.hidden) document.getElementById("skcBulkText").focus();
-  });
-  document.getElementById("skcBulkCancelBtn").addEventListener("click", () => {
-    bulkPanel.hidden = true;
-    document.getElementById("skcBulkText").value = "";
-    document.getElementById("skcBulkMsg").textContent = "";
-  });
-  document.getElementById("skcBulkImportBtn").addEventListener("click", () => {
-    const msg = importSkcBulk(document.getElementById("skcBulkText").value);
-    const msgEl = document.getElementById("skcBulkMsg");
-    msgEl.textContent = msg;
-    if (msg.startsWith("导入完成")) {
-      document.getElementById("skcBulkText").value = "";
-      setTimeout(() => { bulkPanel.hidden = true; msgEl.textContent = ""; }, 1800);
-    }
-  });
   // 历史：清空按钮
   document.getElementById("histClearBtn").addEventListener("click", clearHistory);
   loadState();        // 先恢复上次保存的输入/开关/SKC/历史
