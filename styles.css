@@ -571,7 +571,52 @@ body::before {
   background: var(--white);
   align-self: flex-start;
 }
-.tag-value.is-active { background: var(--ink); color: var(--lime); }
+.tag-value.is-active {
+  background: var(--lime);
+  color: var(--ink);
+  box-shadow: 3px 3px 0 var(--ink);
+}
+/* 报活动时：拆分 两段（加N / 减N），每段独立小贴纸 */
+.tag-value.is-active.is-split {
+  background: transparent;
+  box-shadow: none;
+  padding: 0;
+  border: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0;
+}
+.tag-piece {
+  display: inline-block;
+  font-size: inherit;
+  font-weight: inherit;
+  padding: inherit;
+  border: var(--border);
+  border-radius: 8px;
+  background: var(--lime);
+  color: var(--ink);
+  box-shadow: 3px 3px 0 var(--ink);
+}
+.tag-piece.piece-second {
+  background: var(--yellow);
+  border-color: var(--ink);
+}
+.tag-slash {
+  display: inline-block;
+  font-family: "Oswald", "Space Grotesk", sans-serif;
+  font-weight: 700;
+  font-size: 0.85em;
+  background: var(--ink);
+  color: #fff;
+  padding: 2px 6px;
+  margin: 0 -2px;
+  border-top: var(--border);
+  border-bottom: var(--border);
+  align-self: stretch;
+  display: inline-flex;
+  align-items: center;
+  line-height: 1;
+}
 /* 不报活动：黑底白字 + 粗体 + 实线白边，适配粗野主义风格 */
 .tag-value.is-none {
   background: var(--ink);
