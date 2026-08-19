@@ -1117,6 +1117,17 @@ body::after {
   background: var(--cyan);
 }
 .btn-copy:hover { background: #9ee5f5; }
+
+.btn-clear {
+  background: #ffd0d0;
+  color: #a30000;
+  border-color: #a30000;
+  box-shadow: 3px 3px 0 #a30000;
+}
+.btn-clear:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 4px 4px 0 #a30000;
+}
 .btn-copy.is-flashed {
   background: var(--lime);
   animation: copy-pop 0.3s ease-out;
@@ -1185,6 +1196,24 @@ body::after {
   color: #aaa;
   font-size: 14px;
   font-weight: 700;
+}
+.skc-more {
+  width: 100%;
+  display: block;
+  font-family: "Space Grotesk", "Noto Sans SC", sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--ink);
+  background: var(--lime);
+  border: 2px dashed var(--ink);
+  border-radius: 8px;
+  padding: 7px 10px;
+  cursor: pointer;
+  transition: transform 0.08s ease, box-shadow 0.08s ease;
+}
+.skc-more:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 2px 2px 0 var(--ink);
 }
 .skc-chip {
   display: flex;
