@@ -108,6 +108,8 @@ function calculate(toHistory = false) {
     resetOutputs();
     // 同时清掉还未完成的防抖记录，避免空输入进入历史
     clearTimeout(recordHistory._t);
+    // 即便输入价/原定价为空，也要刷新 SKC 表头（减几已变时立即联动）
+    renderSkc();
     return;
   }
 
@@ -484,25 +486,27 @@ function escapeHtml(s) {
 }
 
 // 复制分类表为四列 TSV，可直接粘到 Excel（Tab 分列、换行分行）
+// 直接从 skcList 全量数据生成，与「放大/缩小」显示状态无关，折叠时也复制完整内容
 async function copySkcToExcel() {
-  const board = document.getElementById("skcBoard");
-  if (!board) return;
-  const cols = Array.from(board.querySelectorAll(".skc-col"));
-  if (cols.length === 0) return;
+  if (!skcList || skcList.length === 0) {
+    flashCopyBtn("✗ 没有可复制的 SKC");
+    return;
+  }
+  const { E3 } = getParams(); // 当前减几，仅用于联动表头
+  const headers = ["减" + (E3 + 4), "减" + (E3 + 3), "减" + (E3 + 2), "不报活动"];
+  const cols = [[], [], [], []];
 
-  // 提取每列的列头与编码列表
-  const headers = cols.map((c) =>
-    c.querySelector(".skc-col-head").firstChild.textContent.trim()
-  );
-  const items = cols.map((c) =>
-    Array.from(c.querySelectorAll(".skc-code")).map((s) => s.textContent.trim())
-  );
+  // 每条 SKC 用自己锁定时的参数算 B9，再映射到列（与 renderSkc 完全一致）
+  skcList.forEach((item) => {
+    const r = compute(item.b2, item.b4, item.a1, item.b1, item.e3);
+    const col = b9ToCol(r.B9);
+    cols[col].push(item.code);
+  });
 
-  const maxRows = Math.max(1, ...items.map((a) => a.length));
-  const lines = [];
-  lines.push(headers.join("\t"));
+  const maxRows = Math.max(1, ...cols.map((a) => a.length));
+  const lines = [headers.join("\t")];
   for (let r = 0; r < maxRows; r++) {
-    lines.push(items.map((arr) => (r < arr.length ? arr[r] : "")).join("\t"));
+    lines.push(cols.map((arr) => (r < arr.length ? arr[r] : "")).join("\t"));
   }
   const tsv = lines.join("\n");
 
