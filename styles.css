@@ -633,20 +633,21 @@ body::after {
   border-color: var(--ink);
 }
 .tag-slash {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  align-self: stretch;
   font-family: "Oswald", "Space Grotesk", sans-serif;
   font-weight: 700;
   font-size: 0.85em;
-  background: var(--ink);
+  background: transparent;
   color: #fff;
-  padding: 2px 6px;
-  margin: 0 -2px;
-  border-top: var(--border);
-  border-bottom: var(--border);
-  align-self: stretch;
-  display: inline-flex;
-  align-items: center;
+  text-shadow: 1px 1px 0 var(--ink), -1px 1px 0 var(--ink), 1px -1px 0 var(--ink), -1px -1px 0 var(--ink);
+  padding: 0 2px;
+  margin: 0 -3px;
   line-height: 1;
+  letter-spacing: -0.5px;
+  position: relative;
+  z-index: 1;
 }
 /* 不报活动：黑底白字 + 粗体 + 实线白边，适配粗野主义风格 */
 .tag-value.is-none {
