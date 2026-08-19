@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>价格计算通用版 · PRICE CALCULATOR</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Oswald:wght@500;700&family=Noto+Sans+SC:wght@400;700;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="noise"></div>
+
+  <header class="topbar">
+    <div class="brand">
+      <div class="logo">¥</div>
+      <div class="brand-text">
+        <span class="tag">PRICE&nbsp;CALCULATOR</span>
+      </div>
+    </div>
+    <div class="topbar-actions">
+      <button id="resetBtn" class="btn btn-ghost" type="button">↺ 重置默认</button>
+    </div>
+  </header>
+
+  <main class="layout">
+    <!-- 输入区 -->
+    <section class="panel panel-inputs">
+      <div class="panel-head">
+        <h2>① 输入参数</h2>
+        <span class="panel-badge">INPUTS</span>
+      </div>
+
+      <div class="field-grid">
+        <label class="field field-coral">
+          <span class="field-label">输入价格</span>
+          <input id="in-price" type="number" step="0.01" value="" />
+          <span class="field-hint">你拿到 / 录入的基准价格</span>
+        </label>
+
+        <label class="field field-cyan">
+          <span class="field-label">原定价</span>
+          <input id="in-origin" type="number" step="0.01" value="" />
+          <span class="field-hint">目标 / 原始挂牌价</span>
+        </label>
+
+        <label class="field field-lime" id="card-a1">
+          <span class="field-label">减价常数</span>
+          <input id="in-deduct" type="number" step="0.01" value="0.5" />
+          <span class="field-hint">先固定减去的数</span>
+        </label>
+
+        <label class="field field-yellow" id="card-b1">
+          <span class="field-label">折扣率</span>
+          <input id="in-rate" type="number" step="0.01" value="0.85" />
+          <span class="field-hint">乘以的系数 (0–1)</span>
+        </label>
+
+        <label class="field field-pink">
+          <span class="field-label">减几</span>
+          <input id="in-sub" type="number" step="1" value="" />
+          <span class="field-hint">报活动时的固定减扣</span>
+        </label>
+      </div>
+
+      <button id="calcBtn" class="btn btn-calc" type="button" title="把当前结果保存到计算历史（输入时实时调参数不会入历史）">立即计算</button>
+
+      <!-- 最近计算历史 -->
+      <div class="history">
+        <div class="history-head">
+          <span class="history-title">最近计算</span>
+          <span class="history-count" id="histCount">0</span>
+          <button class="history-clear" id="histClearBtn" type="button">清空</button>
+        </div>
+        <div class="history-list" id="histList">
+          <div class="history-empty">暂无记录</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 结果区 -->
+    <section class="panel panel-results">
+      <div class="panel-head">
+        <h2>② 计算结果</h2>
+        <span class="panel-badge">OUTPUTS</span>
+      </div>
+
+      <div class="result-grid">
+        <div class="result-card rc-yellow">
+          <span class="rc-label">计算价格</span>
+          <span class="rc-value" id="out-b3">—</span>
+          <span class="rc-formula">输入价 − 减价，再乘折扣率</span>
+        </div>
+
+        <div class="result-card rc-cyan">
+          <span class="rc-label">差价·已取整</span>
+          <span class="rc-value" id="out-b5">—</span>
+          <span class="rc-formula">原定价 − 计算价格（&lt;1留3位，否则取整）</span>
+        </div>
+
+        <div class="result-card rc-lime rc-feature rc-feature-tall">
+          <span class="rc-label">最终价格</span>
+          <span class="rc-value" id="out-b6">—</span>
+          <span class="rc-formula">按差价微调后的成交价</span>
+        </div>
+
+        <div class="result-card rc-coral" id="card-b7">
+          <span class="rc-label">是否报活动</span>
+          <span class="rc-value tag-value" id="out-b7">—</span>
+          <span class="rc-formula">差价≥2时决定加幅</span>
+        </div>
+
+        <div class="result-card rc-pink" id="card-b8">
+          <span class="rc-label">原报活动后价格</span>
+          <span class="rc-value" id="out-b8">—</span>
+          <span class="rc-formula">报活动减扣后的价格</span>
+        </div>
+
+        <div class="result-card rc-purple rc-feature rc-feature-short">
+          <span class="rc-label">最终报活动</span>
+          <span class="rc-value tag-value" id="out-b9">—</span>
+          <span class="rc-formula">最终活动方案</span>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- SKC 统计（首页下方区块） -->
+  <section class="panel panel-skc">
+    <div class="panel-head">
+      <h2>③ SKC 统计</h2>
+      <span class="panel-badge">SKC</span>
+    </div>
+
+    <div class="skc-add">
+      <label class="skc-field">
+        <span class="skc-field-label">SKC 编码</span>
+        <input id="skc-code" type="text" placeholder="如 sz260814..." />
+      </label>
+      <button id="skcAddBtn" class="btn btn-calc skc-add-btn" type="button">＋ 添加</button>
+      <button id="skcCopyBtn" class="btn btn-copy skc-add-btn" type="button">复制到 Excel</button>
+    </div>
+    <p class="skc-hint">价格与原定价自动取自上方「① 输入参数」，<b>每条 SKC 添加后即锁定当时的参数</b>，后续改动上方参数不会影响已添加的 SKC 分类</p>
+
+    <div class="skc-board" id="skcBoard"></div>
+  </section>
+
+  <!-- 显示选项 + 计算逻辑（页面底部大卡片） -->
+  <section class="panel panel-toggles">
+    <div class="panel-head">
+      <h2>④ 显示选项</h2>
+      <span class="panel-badge">OPTIONS</span>
+    </div>
+
+    <div class="toggle-row">
+      <span class="toggle-label">显示「减价常数 / 折扣率」</span>
+      <label class="switch">
+        <input type="checkbox" id="toggle-a1b1" />
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <div class="toggle-row">
+      <span class="toggle-label">显示「是否报活动 / 原报活动后价格」</span>
+      <label class="switch">
+        <input type="checkbox" id="toggle-b7b8" />
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <div class="logic-inside">
+      <details>
+        <summary>📐 计算逻辑拆解（与 Excel 公式一一对应）</summary>
+        <ol class="logic-list">
+          <li><b>计算价格</b> = (输入价 − 减价常数) × 折扣率</li>
+          <li><b>差价</b> = 若 (原定价−计算价格) 首位为 “0”（即小于 1），取前 5 位字符保留小数；否则取整数 INT。</li>
+          <li><b>最终价格</b> = 差价&lt;1 → 计算价格；差价≤4 → 计算价格+差价；否则 计算价格+4。</li>
+          <li><b>是否报活动</b> = 差价≥4 → “加4”；差价=3 → “加3”；差价=2 → “加2”；差价&lt;2 → “不报活动”。</li>
+          <li><b>原报活动后价格</b> = 不报活动 → 最终价格；否则 最终价格 − 右位加幅 − 减几。</li>
+          <li><b>最终报活动</b> = 原报活动后价格≥8 → 维持原方案；否则按差距与加幅降级为 “加N” 或 “不报活动”。</li>
+          <li><b>最终报活动</b> = 不报活动 → 不报活动；否则 “减” + (右位 + 减几)。</li>
+        </ol>
+      </details>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <span>新粗野主义 · Neobrutalism</span>
+    <span>由 Excel「价格计算」表改造 · 仅价格计算页</span>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
