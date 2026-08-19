@@ -435,6 +435,21 @@ body::after {
 .btn:active { transform: translate(3px, 3px); box-shadow: 1px 1px 0 var(--ink); }
 
 .btn-ghost { background: var(--cyan); }
+.btn-install {
+  background: var(--yellow);
+  color: var(--ink);
+  border-color: var(--ink);
+  box-shadow: 3px 3px 0 var(--ink);
+  animation: install-pulse 1.6s ease-in-out infinite;
+}
+.btn-install:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 4px 4px 0 var(--ink);
+}
+@keyframes install-pulse {
+  0%, 100% { box-shadow: 3px 3px 0 var(--ink); }
+  50% { box-shadow: 5px 5px 0 var(--lime); }
+}
 .btn-calc {
   width: 100%;
   margin-top: 20px;
