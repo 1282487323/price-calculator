@@ -501,7 +501,7 @@ function toggleSkcExpand() {
   skcExpanded = !skcExpanded;
   const btn = document.getElementById("skcExpandBtn");
   if (btn) {
-    btn.textContent = skcExpanded ? "⤡ 收起" : "⤢ 展开";
+    btn.textContent = skcExpanded ? "收起" : "展开";
     btn.title = skcExpanded ? "缩小：每列只显示部分" : "放大：显示全部";
   }
   renderSkc();
@@ -579,7 +579,7 @@ function escapeHtml(s) {
 // 直接从 skcList 全量数据生成，与「放大/缩小」显示状态无关，折叠时也复制完整内容
 async function copySkcToExcel() {
   if (!skcList || skcList.length === 0) {
-    flashCopyBtn("✗ 没有可复制的 SKC");
+    flashCopyBtn("没有可复制的 SKC");
     return;
   }
   const { E3 } = getParams(); // 当前减几，仅用于联动表头
@@ -618,7 +618,7 @@ async function copySkcToExcel() {
     } catch (_) {}
     document.body.removeChild(ta);
   }
-  flashCopyBtn(ok ? "✓ 已复制，去 Excel 粘贴" : "✗ 复制失败");
+  flashCopyBtn(ok ? "已复制，去 Excel 粘贴" : "复制失败");
 }
 
 function flashCopyBtn(text) {
@@ -709,7 +709,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 /* =========================================================
    PWA：注册 Service Worker + 安装按钮（beforeinstallprompt）
-   - 安装前：黄色「⬇ 安装应用」按钮常显，呼吸灯提示
+   - 安装前：黄色「安装应用」按钮常显，呼吸灯提示
    - 安装中：调用 prompt()
    - 安装后 / 已经是 standalone：按钮自动隐藏
    ========================================================= */
@@ -766,10 +766,10 @@ function initPwa() {
       if (choice && choice.outcome === "accepted") {
         btn.hidden = true; // 即时隐藏，等 appinstalled 再确认
       } else {
-        btn.textContent = "⬇ 安装应用";
+        btn.textContent = "安装应用";
       }
     } catch (e) {
-      btn.textContent = "⬇ 安装应用";
+      btn.textContent = "安装应用";
     } finally {
       btn.disabled = false;
       deferredPrompt = null;
