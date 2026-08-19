@@ -391,6 +391,30 @@ function removeSkc(i) {
   renderSkc();
 }
 
+// 一键清空所有 SKC（带确认）
+function clearAllSkc() {
+  if (skcList.length === 0) {
+    alert("当前没有可清空的 SKC");
+    return;
+  }
+  if (!confirm("确定要清空全部 " + skcList.length + " 条 SKC 吗？此操作不可撤销")) return;
+  skcList.length = 0;
+  renderSkc();
+}
+
+// SKC 面板放大/缩小：放大=显示全部；缩小=每列只显示前 SKC_COLLAPSED_MAX 个
+const SKC_COLLAPSED_MAX = 3;
+let skcExpanded = false;
+function toggleSkcExpand() {
+  skcExpanded = !skcExpanded;
+  const btn = document.getElementById("skcExpandBtn");
+  if (btn) {
+    btn.textContent = skcExpanded ? "⤡ 收起" : "⤢ 展开";
+    btn.title = skcExpanded ? "缩小：每列只显示部分" : "放大：显示全部";
+  }
+  renderSkc();
+}
+
 // 渲染分类表
 function renderSkc() {
   const board = document.getElementById("skcBoard");
@@ -409,6 +433,9 @@ function renderSkc() {
     cols[col].push({ i, code: item.code, b6: r.B6, b10: r.B10 });
   });
 
+  // 缩小状态：每列限制显示数量，超出部分用「+N 更多」占位
+  const limit = skcExpanded ? Infinity : SKC_COLLAPSED_MAX;
+
   let html = "";
   headers.forEach((h, ci) => {
     const items = cols[ci];
@@ -418,13 +445,19 @@ function renderSkc() {
     if (items.length === 0) {
       html += '<div class="skc-empty">—</div>';
     } else {
-      items.forEach((it) => {
+      const shown = items.slice(0, limit);
+      shown.forEach((it) => {
         html += '<div class="skc-chip">' +
           '<span class="skc-code">' + escapeHtml(it.code) + "</span>" +
           '<span class="skc-price">' + fmt(it.b6) + "</span>" +
           '<button class="skc-del" type="button" data-i="' + it.i + '" title="删除">×</button>' +
           "</div>";
       });
+      // 缩小且有剩余：显示「+N 更多」占位条（点击展开）
+      if (items.length > limit) {
+        const rest = items.length - limit;
+        html += '<button class="skc-more" type="button" id="skcMoreBtn" title="显示全部">+' + rest + ' 更多</button>';
+      }
     }
     html += "</div></div>";
   });
@@ -434,6 +467,13 @@ function renderSkc() {
   board.querySelectorAll(".skc-del").forEach((btn) => {
     btn.addEventListener("click", () => removeSkc(parseInt(btn.dataset.i, 10)));
   });
+  // 绑定「+N 更多」→ 直接放大
+  const moreBtn = document.getElementById("skcMoreBtn");
+  if (moreBtn) {
+    moreBtn.addEventListener("click", () => {
+      if (!skcExpanded) toggleSkcExpand();
+    });
+  }
 }
 
 // 简单转义，避免 SKC 文本破坏结构
@@ -535,6 +575,10 @@ document.addEventListener("DOMContentLoaded", () => {
   });
   // SKC 一键复制到 Excel
   document.getElementById("skcCopyBtn").addEventListener("click", copySkcToExcel);
+  // SKC 一键清空
+  document.getElementById("skcClearBtn").addEventListener("click", clearAllSkc);
+  // SKC 放大/缩小切换
+  document.getElementById("skcExpandBtn").addEventListener("click", toggleSkcExpand);
   // 历史：清空按钮
   document.getElementById("histClearBtn").addEventListener("click", clearHistory);
   applyToggle();
