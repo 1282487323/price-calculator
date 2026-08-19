@@ -1147,6 +1147,44 @@ body::after {
   line-height: 1.5;
 }
 
+.skc-bulk {
+  margin-top: 14px;
+  padding: 14px;
+  border: 2px dashed var(--ink);
+  border-radius: 12px;
+  background: rgba(196, 255, 51, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.skc-bulk-text {
+  width: 100%;
+  font-family: "Space Grotesk", "Noto Sans SC", monospace;
+  font-size: 14px;
+  line-height: 1.5;
+  border: 2px solid var(--ink);
+  border-radius: 8px;
+  padding: 10px 12px;
+  resize: vertical;
+  box-sizing: border-box;
+}
+.skc-bulk-text:focus {
+  outline: none;
+  box-shadow: 3px 3px 0 var(--lime);
+}
+.skc-bulk-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.skc-bulk-actions .btn { margin-top: 0; }
+.skc-bulk-msg {
+  font-family: "Noto Sans SC", sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
 .skc-board {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
