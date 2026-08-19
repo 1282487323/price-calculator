@@ -544,4 +544,76 @@ document.addEventListener("DOMContentLoaded", () => {
   // 启动实时时钟
   updateClock();
   setInterval(updateClock, 1000);
+  // PWA：注册 SW + 安装按钮逻辑
+  initPwa();
 });
+
+/* =========================================================
+   PWA：注册 Service Worker + 安装按钮（beforeinstallprompt）
+   - 安装前：黄色「⬇ 安装应用」按钮常显，呼吸灯提示
+   - 安装中：调用 prompt()
+   - 安装后 / 已经是 standalone：按钮自动隐藏
+   ========================================================= */
+function isStandalone() {
+  return (
+    window.matchMedia("(display-mode: standalone)").matches ||
+    window.matchMedia("(display-mode: minimal-ui)").matches ||
+    window.navigator.standalone === true // iOS Safari
+  );
+}
+
+function initPwa() {
+  // 注册 Service Worker（仅在 https / localhost 下生效；本地 file:// 不报错但会被拒）
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker.register("./sw.js").catch((e) => console.warn("SW 注册失败", e));
+    });
+  }
+
+  const btn = document.getElementById("installBtn");
+  if (!btn) return;
+
+  // 已是 standalone（用户从桌面图标进入）→ 直接不显示
+  if (isStandalone()) {
+    btn.hidden = true;
+    return;
+  }
+
+  // 保存 beforeinstallprompt 事件，点按钮时调用 prompt()
+  let deferredPrompt = null;
+  window.addEventListener("beforeinstallprompt", (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    btn.hidden = false;
+  });
+
+  // 用户同意安装后：appinstalled 事件触发，隐藏按钮
+  window.addEventListener("appinstalled", () => {
+    btn.hidden = true;
+    deferredPrompt = null;
+  });
+
+  btn.addEventListener("click", async () => {
+    if (!deferredPrompt) {
+      // 浏览器还没派发 beforeinstallprompt（多见于隐身模式或已被用户忽略多次）
+      btn.title = "请通过浏览器菜单中的「添加到主屏幕/安装应用」";
+      return;
+    }
+    btn.disabled = true;
+    btn.textContent = "安装中…";
+    try {
+      deferredPrompt.prompt();
+      const choice = await deferredPrompt.userChoice;
+      if (choice && choice.outcome === "accepted") {
+        btn.hidden = true; // 即时隐藏，等 appinstalled 再确认
+      } else {
+        btn.textContent = "⬇ 安装应用";
+      }
+    } catch (e) {
+      btn.textContent = "⬇ 安装应用";
+    } finally {
+      btn.disabled = false;
+      deferredPrompt = null;
+    }
+  });
+}
