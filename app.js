@@ -456,6 +456,54 @@ function removeSkc(i) {
   saveState();
 }
 
+// 行内修改 SKC 编码：点「改」→ 编码变输入框 → 回车/失焦提交
+function startEditSkc(i) {
+  const item = skcList[i];
+  if (!item) return;
+  const board = document.getElementById("skcBoard");
+  const span = board.querySelector('.skc-code[data-i="' + i + '"]');
+  if (!span) return;
+
+  const input = document.createElement("input");
+  input.type = "text";
+  input.className = "skc-edit-input";
+  input.value = item.code;
+  let done = false;
+  const commit = () => {
+    if (done) return;
+    done = true;
+    const code = input.value.trim();
+    if (!code) {
+      alert("SKC 编码不能为空");
+      renderSkc();
+      return;
+    }
+    if (skcList.some((s, j) => j !== i && s.code === code)) {
+      alert("SKC 编码【" + code + "】已存在，请换一个");
+      renderSkc();
+      return;
+    }
+    item.code = code;
+    renderSkc();
+    saveState();
+  };
+  const cancel = () => {
+    if (done) return;
+    done = true;
+    renderSkc();
+  };
+
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") { e.preventDefault(); commit(); }
+    else if (e.key === "Escape") { e.preventDefault(); cancel(); }
+  });
+  input.addEventListener("blur", commit);
+
+  span.replaceWith(input);
+  input.focus();
+  input.select();
+}
+
 // 一键清空所有 SKC（带确认）
 function clearAllSkc() {
   if (skcList.length === 0) {
@@ -514,8 +562,9 @@ function renderSkc() {
       const shown = items.slice(0, limit);
       shown.forEach((it) => {
         html += '<div class="skc-chip">' +
-          '<span class="skc-code">' + escapeHtml(it.code) + "</span>" +
+          '<span class="skc-code" data-i="' + it.i + '">' + escapeHtml(it.code) + "</span>" +
           '<span class="skc-price">' + fmt(it.b6) + "</span>" +
+          '<button class="skc-edit" type="button" data-i="' + it.i + '" title="修改编码">改</button>' +
           '<button class="skc-del" type="button" data-i="' + it.i + '" title="删除">×</button>' +
           "</div>";
       });
@@ -532,6 +581,10 @@ function renderSkc() {
   // 绑定删除按钮
   board.querySelectorAll(".skc-del").forEach((btn) => {
     btn.addEventListener("click", () => removeSkc(parseInt(btn.dataset.i, 10)));
+  });
+  // 绑定修改编码按钮 → 行内编辑
+  board.querySelectorAll(".skc-edit").forEach((btn) => {
+    btn.addEventListener("click", () => startEditSkc(parseInt(btn.dataset.i, 10)));
   });
   // 绑定「+N 更多」→ 直接放大
   const moreBtn = document.getElementById("skcMoreBtn");
@@ -612,6 +665,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // 立即计算：算 + 入历史（每次点击都新增一条，相同参数也计入）
   document.getElementById("calcBtn").addEventListener("click", () => calculate(true));
   document.getElementById("resetBtn").addEventListener("click", resetDefaults);
+  document.getElementById("printBtn").addEventListener("click", () => window.print());
   // 实时输入：只算，不入历史（避免试算过程的中间态污染历史）
   // 任意输入框按回车 = 立即计算（入历史）
   document.querySelectorAll(".field input").forEach((inp) => {
@@ -659,6 +713,19 @@ document.addEventListener("DOMContentLoaded", () => {
   setInterval(updateClock, 1000);
   // PWA：注册 SW + 安装按钮逻辑
   initPwa();
+  // 打印前自动展开 SKC（确保全部编码都打印出来），打印后恢复原状
+  let prevExpanded = null;
+  window.addEventListener("beforeprint", () => {
+    prevExpanded = skcExpanded;
+    if (!skcExpanded) { skcExpanded = true; renderSkc(); }
+  });
+  window.addEventListener("afterprint", () => {
+    if (prevExpanded !== null && prevExpanded !== skcExpanded) {
+      skcExpanded = prevExpanded;
+      renderSkc();
+    }
+    prevExpanded = null;
+  });
 });
 
 /* =========================================================
