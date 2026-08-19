@@ -177,6 +177,23 @@ function resetDefaults() {
   resetOutputs();
 }
 
+// ===== 顶栏实时时钟 =====
+// 周映射（0=周日）
+const WEEK_ZH = ["周日", "周一", "周二", "周三", "周四", "周五", "周六"];
+
+function updateClock() {
+  const d = new Date();
+  const pad2 = (n) => String(n).padStart(2, "0");
+  const dateEl = document.getElementById("clockDate");
+  const timeEl = document.getElementById("clockTime");
+  if (!dateEl || !timeEl) return;
+  const dateStr = `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())} · ${WEEK_ZH[d.getDay()]}`;
+  const timeStr = `${pad2(d.getHours())}:${pad2(d.getMinutes())}:${pad2(d.getSeconds())}`;
+  // 仅当变化时写入 DOM（避免无谓 reflow）
+  if (dateEl.textContent !== dateStr) dateEl.textContent = dateStr;
+  if (timeEl.textContent !== timeStr) timeEl.textContent = timeStr;
+}
+
 // 把结果区重置为占位符
 function resetOutputs() {
   document.getElementById("out-b3").textContent = "—";
@@ -524,4 +541,7 @@ document.addEventListener("DOMContentLoaded", () => {
   resetOutputs();
   renderSkc();
   renderHistory();
+  // 启动实时时钟
+  updateClock();
+  setInterval(updateClock, 1000);
 });
