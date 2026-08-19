@@ -43,6 +43,153 @@ body {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
+/* ===== 点阵网格底纹 ===== */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image: radial-gradient(circle, rgba(10,10,10,0.06) 1.5px, transparent 1.5px);
+  background-size: 38px 38px;
+}
+
+/* ===== 漂浮几何图形 ===== */
+.bg-shapes {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.shape {
+  position: absolute;
+  opacity: 0.09;
+  will-change: transform;
+}
+
+/* 方框 */
+.s-square {
+  top: 8%;
+  left: 4%;
+  width: 120px;
+  height: 120px;
+  border: 4px solid var(--ink);
+  background: var(--yellow);
+  animation: floatA 24s ease-in-out infinite;
+}
+
+/* 圆环 */
+.s-circle {
+  top: 12%;
+  right: 6%;
+  width: 90px;
+  height: 90px;
+  border: 5px solid var(--ink);
+  border-radius: 50%;
+  background: var(--cyan);
+  animation: floatB 30s ease-in-out infinite;
+}
+
+/* 三角形 */
+.s-triangle {
+  bottom: 14%;
+  left: 5%;
+  width: 0;
+  height: 0;
+  border-left: 55px solid transparent;
+  border-right: 55px solid transparent;
+  border-bottom: 95px solid var(--coral);
+  opacity: 0.08;
+  animation: floatC 28s ease-in-out infinite;
+}
+
+/* 十字加号 */
+.s-cross {
+  top: 48%;
+  right: 3%;
+  width: 70px;
+  height: 70px;
+  opacity: 0.07;
+  animation: floatD 26s ease-in-out infinite;
+}
+.s-cross::before,
+.s-cross::after {
+  content: "";
+  position: absolute;
+  background: var(--ink);
+}
+.s-cross::before {
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: 14px;
+  transform: translateY(-50%);
+}
+.s-cross::after {
+  left: 50%;
+  top: 0;
+  width: 14px;
+  height: 100%;
+  transform: translateX(-50%);
+}
+
+/* 小方块群 */
+.s-dots {
+  bottom: 8%;
+  right: 8%;
+  width: 100px;
+  height: 100px;
+  opacity: 0.06;
+  background-image:
+    linear-gradient(var(--ink) 8px, transparent 8px),
+    linear-gradient(90deg, var(--ink) 8px, transparent 8px);
+  background-size: 28px 28px;
+  animation: floatA 32s ease-in-out infinite reverse;
+}
+
+/* 之字形线条 */
+.s-zigzag {
+  top: 38%;
+  left: 2%;
+  width: 80px;
+  height: 80px;
+  opacity: 0.06;
+  background: var(--purple);
+  clip-path: polygon(0 20%, 50% 0, 50% 40%, 100% 20%, 100% 60%, 50% 40%, 50% 80%, 0 100%, 0 60%, 50% 40%, 50% 0);
+  animation: floatB 34s ease-in-out infinite reverse;
+}
+
+@keyframes floatA {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  25% { transform: translate(20px, -18px) rotate(8deg); }
+  50% { transform: translate(-12px, 24px) rotate(-5deg); }
+  75% { transform: translate(16px, 10px) rotate(3deg); }
+}
+
+@keyframes floatB {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  33% { transform: translate(-22px, 16px) rotate(-10deg); }
+  66% { transform: translate(18px, -20px) rotate(6deg); }
+}
+
+@keyframes floatC {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  50% { transform: translate(24px, -16px) rotate(12deg); }
+}
+
+@keyframes floatD {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  40% { transform: translate(-18px, 22px) rotate(-8deg); }
+  70% { transform: translate(14px, -10px) rotate(5deg); }
+}
+
+/* 滚动到底部时图形逐渐淡出 */
+@media (prefers-reduced-motion: reduce) {
+  .shape { animation: none !important; }
+}
+
 /* ===== 顶栏 ===== */
 .topbar {
   position: relative;
