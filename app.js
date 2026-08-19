@@ -142,13 +142,27 @@ function calculate(toHistory = false) {
   }
 }
 
-// 活动状态标签渲染：激活态 = 黑底绿字，不报活动 = 黑底白字
+// 活动状态标签渲染：报活动时拆为 两段小贴纸（加N / 减N）；不报活动 = 黑底白字
 function renderTag(id, value) {
   const el = document.getElementById(id);
-  el.textContent = value;
-  el.classList.remove("is-active", "is-none");
-  if (value === "不报活动") el.classList.add("is-none");
-  else el.classList.add("is-active");
+  el.classList.remove("is-active", "is-none", "is-split");
+  if (value === "不报活动") {
+    el.textContent = value;
+    el.classList.add("is-none");
+    return;
+  }
+  // value 形如 "加2 / 减6"
+  const m = /^([^\/]+)\s*\/\s*(.+)$/.exec(value);
+  if (m) {
+    el.innerHTML =
+      '<span class="tag-piece">' + m[1].trim() + '</span>' +
+      '<span class="tag-slash">/</span>' +
+      '<span class="tag-piece piece-second">' + m[2].trim() + '</span>';
+    el.classList.add("is-active", "is-split");
+  } else {
+    el.textContent = value;
+    el.classList.add("is-active");
+  }
 }
 
 // 重置：清空三个主输入项；隐藏参数保持默认值；结果区回到占位符
