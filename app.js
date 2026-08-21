@@ -185,7 +185,11 @@ function calculate(toHistory = false) {
   document.getElementById("out-b8").textContent = fmt(B8);
 
   renderTag("out-b7", B7);
-  renderTag("out-b9", B9 === "不报活动" ? B9 : (B9 + " / " + B10));
+  if (B5 < 0) {
+    renderUnavailable("out-b9");
+  } else {
+    renderTag("out-b9", B9 === "不报活动" ? B9 : (B9 + " / " + B10));
+  }
 
   // 参数变化时，SKC 分类表同步刷新
   renderSkc();
@@ -201,7 +205,7 @@ function calculate(toHistory = false) {
 // 活动状态标签渲染：报活动时拆为 两段小贴纸（加N / 减N）；不报活动 = 黑底白字
 function renderTag(id, value) {
   const el = document.getElementById(id);
-  el.classList.remove("is-active", "is-none", "is-split");
+  el.classList.remove("is-active", "is-none", "is-split", "is-unavailable");
   if (value === "不报活动") {
     el.textContent = value;
     el.classList.add("is-none");
@@ -219,6 +223,14 @@ function renderTag(id, value) {
     el.textContent = value;
     el.classList.add("is-active");
   }
+}
+
+// 差价低于原定价（B5<0）：最终报活动卡片标红显示「此商品不可用」
+function renderUnavailable(id) {
+  const el = document.getElementById(id);
+  el.classList.remove("is-active", "is-none", "is-split", "is-unavailable");
+  el.classList.add("is-unavailable");
+  el.textContent = "此商品不可用";
 }
 
 // 重置：清空三个主输入项；隐藏参数保持默认值；结果区回到占位符
@@ -268,7 +280,7 @@ function resetOutputs() {
 
   const outB9 = document.getElementById("out-b9");
   outB9.textContent = "—";
-  outB9.classList.remove("is-active", "is-none");
+  outB9.classList.remove("is-active", "is-none", "is-unavailable");
 }
 
 // 显隐开关：A1/B1 与 B7/B8
