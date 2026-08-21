@@ -18,6 +18,26 @@ function num(v) {
   return Number.isFinite(n) ? n : 0;
 }
 
+// ===== 「减几」必填闸门 =====
+// 为空时全部锁死：不计算（结果显示「—」）、不自动粘贴价格、不自动复制最终价、
+// 不可添加 SKC、点「立即计算」/回车不入历史；填上后一切自动恢复。
+// 注意：填 0 视为有效值（减 0），不算空。
+function isSubLocked() {
+  const v = document.getElementById("in-sub").value;
+  return String(v).trim() === "";
+}
+
+// 切换「减几」字段的橙色警示态（边框 + hint 文案），calculate() 每次都会调用
+function updateSubWarn() {
+  const inp = document.getElementById("in-sub");
+  if (!inp) return;
+  const field = inp.closest(".field");
+  const hint = field ? field.querySelector(".field-hint") : null;
+  const locked = isSubLocked();
+  if (field) field.classList.toggle("field-warn", locked);
+  if (hint) hint.textContent = locked ? "⚠ 必填：报活动需要「减几」" : "报活动时的固定减扣";
+}
+
 // 点击「输入价格 / 原定价」后，实时从剪贴板读取最近一次复制内容并填入
 // - 每次点击都实时读取（复制新内容后再点即填入最新值）
 // - 取剪贴板文本中的第一个数字（适配从 Excel/网页复制带单位或前后缀的文本）
@@ -27,6 +47,11 @@ function num(v) {
 let _clipDenied = false;
 async function pasteFromClipboard(inp) {
   if (_clipDenied) return;
+  // 「减几」为空 → 锁死：不自动粘贴，提示原因
+  if (isSubLocked()) {
+    toast("⚠ 请先填写「减几」，再粘贴价格", false);
+    return;
+  }
   try {
     if (!navigator.clipboard || !navigator.clipboard.readText) return;
     const text = (await navigator.clipboard.readText()).trim();
@@ -46,6 +71,7 @@ async function pasteFromClipboard(inp) {
 // - 复制 out-b6 的纯数字文本（fmt 输出，可直接粘贴进 Excel）
 // - 成功复制后弹出轻提示「已复制最终价格：xx」；失败则静默（如浏览器拦截）
 async function copyFinalPrice() {
+  if (isSubLocked()) return; // 「减几」为空 → 锁死，不自动复制
   const b2 = num(document.getElementById("in-price").value);
   const b4 = num(document.getElementById("in-origin").value);
   if (!(b2 > 0) || !(b4 > 0)) return; // 两个价格未齐全不复制
@@ -83,6 +109,11 @@ let _skcAutoAdding = false;
 async function pasteSkcFromClipboard() {
   const inp = document.getElementById("skc-code");
   if (!inp || _skcAutoAdding || _skcClipDenied) return;
+  // 「减几」为空 → 锁死：不自动添加 SKC
+  if (isSubLocked()) {
+    toast("⚠ 请先填写「减几」，再添加 SKC", false);
+    return;
+  }
   try {
     if (!navigator.clipboard || !navigator.clipboard.readText) return;
     const text = (await navigator.clipboard.readText()).trim();
@@ -289,6 +320,18 @@ function calculate(toHistory = false) {
   const A1 = num(document.getElementById("in-deduct").value); // 减价常数
   const B1 = num(document.getElementById("in-rate").value);   // 折扣率
   const E3 = num(document.getElementById("in-sub").value);    // 减几
+
+  // 「减几」必填闸门：为空 → 全部锁死，结果区回「—」，不计算不入历史
+  updateSubWarn();
+  if (isSubLocked()) {
+    resetOutputs();
+    clearTimeout(recordHistory._t);
+    renderSkc();
+    saveState();
+    // 仅在用户显式动作（立即计算 / 回车）时提示，避免每次敲键都弹
+    if (toHistory) toast("⚠ 请先填写「减几」，暂不能计算", false);
+    return;
+  }
 
   // 输入价/原定价未填入有效正数 → 结果区全部回到占位符「—」
   // （避免用默认值硬算出一个误导性的 -0.425）
@@ -574,6 +617,11 @@ function addOneSkc(code) {
 
 // 单条添加（绑定「＋ 添加」按钮 / 回车）
 function addSkc() {
+  // 「减几」为空 → 锁死：禁止添加 SKC
+  if (isSubLocked()) {
+    toast("⚠ 请先填写「减几」，再添加 SKC", false);
+    return;
+  }
   const code = document.getElementById("skc-code").value.trim();
   if (!code) {
     alert("请先填写 SKC 编码");
@@ -597,11 +645,64 @@ function addSkc() {
   saveState();
 }
 
-// 删除一条 SKC
+// 删除一条 SKC（6 秒内可撤销：按原位置、原锁定参数原样恢复）
+let _skcUndo = null;
+let _skcUndoTimer = null;
 function removeSkc(i) {
+  const item = skcList[i];
+  if (!item) return;
   skcList.splice(i, 1);
   renderSkc();
   saveState();
+  showSkcUndo(item, i);
+}
+
+// 底部撤销提示条：显示被删编码 +「撤销」按钮，6 秒后自动消失
+function showSkcUndo(item, index) {
+  let bar = document.getElementById("__skcUndo");
+  if (!bar) {
+    bar = document.createElement("div");
+    bar.id = "__skcUndo";
+    bar.style.cssText = "position:fixed;left:50%;bottom:24px;transform:translateX(-50%);display:flex;align-items:center;gap:14px;background:#121212;color:#fff;padding:10px 16px;border-radius:10px;font-size:14px;font-weight:600;z-index:9999;box-shadow:0 6px 18px rgba(0,0,0,.3);opacity:0;transition:opacity .2s;pointer-events:none;";
+    const msg = document.createElement("span");
+    msg.id = "__skcUndoMsg";
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.textContent = "撤销";
+    btn.style.cssText = "border:2px solid #fff;background:transparent;color:#fff;font-weight:700;font-size:13px;padding:3px 14px;border-radius:7px;cursor:pointer;";
+    btn.addEventListener("click", undoSkcRemove);
+    bar.appendChild(msg);
+    bar.appendChild(btn);
+    document.body.appendChild(bar);
+  }
+  document.getElementById("__skcUndoMsg").textContent = "已删除 " + item.code;
+  _skcUndo = { item, index };
+  clearTimeout(_skcUndoTimer);
+  bar.style.pointerEvents = "auto";
+  void bar.offsetWidth;
+  bar.style.opacity = "1";
+  _skcUndoTimer = setTimeout(() => {
+    bar.style.opacity = "0";
+    bar.style.pointerEvents = "none";
+    _skcUndo = null;
+  }, 6000);
+}
+
+// 撤销删除：把 SKC 插回原位置（若期间又删了别的条目，插到不越界的最近位置）
+function undoSkcRemove() {
+  if (!_skcUndo) return;
+  const { item, index } = _skcUndo;
+  _skcUndo = null;
+  clearTimeout(_skcUndoTimer);
+  const bar = document.getElementById("__skcUndo");
+  if (bar) {
+    bar.style.opacity = "0";
+    bar.style.pointerEvents = "none";
+  }
+  skcList.splice(Math.min(index, skcList.length), 0, item);
+  renderSkc();
+  saveState();
+  toast("✓ 已恢复 SKC：" + item.code);
 }
 
 // 行内修改 SKC 编码：点「改」→ 编码变输入框 → 回车/失焦提交
