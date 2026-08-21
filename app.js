@@ -73,6 +73,34 @@ async function copyFinalPrice() {
   }
 }
 
+// SKC 编码输入框：点击/聚焦时从剪贴板读取最新内容并自动添加
+// - 仅真正点击输入框时触发（pointerdown 时间窗口 300ms），避免窗口切换误触发
+// - 读取剪贴板文本后填入 skc-code 并调用 addSkc() 自动添加
+// - 添加成功后会清空并重新聚焦；用 _skcAutoAdding 标记防止循环触发
+// - 权限被拒：置 _skcClipDenied 标记，后续点击不再尝试（避免反复弹窗）
+let _skcClipDenied = false;
+let _skcAutoAdding = false;
+async function pasteSkcFromClipboard() {
+  const inp = document.getElementById("skc-code");
+  if (!inp || _skcAutoAdding || _skcClipDenied) return;
+  try {
+    if (!navigator.clipboard || !navigator.clipboard.readText) return;
+    const text = (await navigator.clipboard.readText()).trim();
+    if (!text) return;
+    inp.value = text;
+    _skcAutoAdding = true;
+    try {
+      addSkc();
+    } finally {
+      _skcAutoAdding = false;
+    }
+  } catch (e) {
+    // 权限被拒 / 非安全上下文 / 用户取消：标记后跳过，避免每次点击都弹窗
+    _skcClipDenied = true;
+    _skcAutoAdding = false;
+  }
+}
+
 // 兼容性兜底：老浏览器无 Clipboard API 时用 execCommand 复制
 function legacyCopy(text) {
   const ta = document.createElement("textarea");
@@ -797,6 +825,24 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   });
+  // SKC 编码输入框：真正点击/聚焦时从剪贴板读取并自动添加
+  // 同样用 pointerdown 时间窗口过滤浏览器自动聚焦，避免窗口切换误触发
+  (function setupSkcPaste() {
+    const inp = document.getElementById("skc-code");
+    if (!inp) return;
+    const field = inp.closest(".skc-field");
+    if (!field) return;
+    let lastPointerDown = 0;
+    const POINTER_FOCUS_WINDOW = 300; // ms
+    field.addEventListener("pointerdown", () => { lastPointerDown = Date.now(); });
+    field.addEventListener("mousedown", () => { lastPointerDown = Date.now(); });
+    inp.addEventListener("focus", () => {
+      if (Date.now() - lastPointerDown <= POINTER_FOCUS_WINDOW) {
+        pasteSkcFromClipboard();
+      }
+    });
+  })();
+
   // 显隐开关
   document.getElementById("toggle-b7b8").addEventListener("change", applyToggle);
   document.getElementById("toggle-a1b1").addEventListener("change", applyToggle);
