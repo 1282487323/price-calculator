@@ -90,7 +90,12 @@ async function pasteSkcFromClipboard() {
     inp.value = text;
     _skcAutoAdding = true;
     try {
+      const before = skcList.length;
       addSkc();
+      // 添加成功（skcList 增长）才给成功提示；失败路径由 addSkc 自带弹窗处理
+      if (skcList.length > before) {
+        toast("✓ 已自动添加 SKC：" + text);
+      }
     } finally {
       _skcAutoAdding = false;
     }
