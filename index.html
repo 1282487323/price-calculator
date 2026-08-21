@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#000000" />
-  <meta name="description" content="新粗野主义风的价格与折扣计算工具，支持离线安装。" />
+  <meta name="theme-color" content="#2568EF" />
+  <meta name="description" content="简洁实用的价格与折扣计算工具，支持离线安装。" />
   <link rel="manifest" href="manifest.json" />
   <link rel="apple-touch-icon" href="icon-192.png" />
   <title>价格计算通用版 · PRICE CALCULATOR</title>
@@ -12,6 +12,15 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Oswald:wght@500;700&family=Noto+Sans+SC:wght@400;700;900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="color-theme.css" />
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('pc_theme') || 'blue';
+        document.documentElement.setAttribute('data-theme', t);
+      } catch (e) {}
+    })();
+  </script>
 </head>
 <body>
   <div class="noise"></div>
@@ -44,6 +53,7 @@
     </div>
     <div class="topbar-actions">
       <button id="installBtn" class="btn btn-install" type="button" hidden>安装应用</button>
+      <button id="themeBtn" class="btn btn-ghost" type="button" title="切换配色主题">彩色版</button>
       <button id="printBtn" class="btn btn-ghost" type="button" title="打印 / 导出 PDF">打印</button>
       <button id="resetBtn" class="btn btn-ghost" type="button">重置默认</button>
     </div>
@@ -199,7 +209,7 @@
 
     <div class="logic-inside">
       <details>
-        <summary>📐 计算逻辑拆解（与 Excel 公式一一对应）</summary>
+        <summary>计算逻辑拆解（与 Excel 公式一一对应）</summary>
         <ol class="logic-list">
           <li><b>计算价格</b> = (输入价 − 减价常数) × 折扣率</li>
           <li><b>差价</b> = 若 (原定价−计算价格) 首位为 “0”（即小于 1），取前 5 位字符保留小数；否则取整数 INT。</li>
@@ -214,7 +224,7 @@
   </section>
 
   <footer class="footer">
-    <span>新粗野主义 · Neobrutalism</span>
+    <span>价格计算通用版 · Price Calculator</span>
   </footer>
 
   <script src="app.js"></script>
