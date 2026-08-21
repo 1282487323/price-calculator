@@ -18,6 +18,86 @@ function num(v) {
   return Number.isFinite(n) ? n : 0;
 }
 
+// 点击「输入价格 / 原定价」后，实时从剪贴板读取最近一次复制内容并填入
+// - 每次点击都实时读取（复制新内容后再点即填入最新值）
+// - 取剪贴板文本中的第一个数字（适配从 Excel/网页复制带单位或前后缀的文本）
+// - 若剪贴板无数字，则回退为原始去空白文本
+// - 权限被拒：置 _clipDenied 标记，后续点击不再尝试（避免反复弹窗）；其余异常静默忽略
+//   注：HTTPS 等安全环境下，首次授权后浏览器会记住权限，后续点击不再弹窗
+let _clipDenied = false;
+async function pasteFromClipboard(inp) {
+  if (_clipDenied) return;
+  try {
+    if (!navigator.clipboard || !navigator.clipboard.readText) return;
+    const text = (await navigator.clipboard.readText()).trim();
+    if (!text) return;
+    const m = text.match(/-?\d+(?:\.\d+)?/);
+    const val = m ? m[0] : text;
+    inp.value = val;
+    calculate();
+    copyFinalPrice();
+  } catch (e) {
+    // 权限被拒 / 非安全上下文 / 用户取消：标记后跳过，避免每次点击都弹窗
+    _clipDenied = true;
+  }
+}
+
+// 自动复制「最终价格(B6)」：仅在输入价与原定价都已填好（有效正数）时执行
+// - 复制 out-b6 的纯数字文本（fmt 输出，可直接粘贴进 Excel）
+// - 成功复制后弹出轻提示「已复制最终价格：xx」；失败则静默（如浏览器拦截）
+async function copyFinalPrice() {
+  const b2 = num(document.getElementById("in-price").value);
+  const b4 = num(document.getElementById("in-origin").value);
+  if (!(b2 > 0) || !(b4 > 0)) return; // 两个价格未齐全不复制
+  // 差价(B5) > 0（非「低于原定价」红字）时才自动复制
+  const a1 = num(document.getElementById("in-deduct").value);
+  const b1 = num(document.getElementById("in-rate").value);
+  const e3 = num(document.getElementById("in-sub").value);
+  const { B5 } = compute(b2, b4, a1, b1, e3);
+  if (!(B5 > 0)) return;
+  const el = document.getElementById("out-b6");
+  if (!el) return;
+  const text = (el.textContent || "").trim();
+  if (!text || text === "—") return;
+  try {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      await navigator.clipboard.writeText(text);
+    } else {
+      legacyCopy(text);
+    }
+    toast("已复制最终价格：" + text);
+  } catch (e) { /* 复制被拦截，静默 */ }
+}
+
+// 兼容性兜底：老浏览器无 Clipboard API 时用 execCommand 复制
+function legacyCopy(text) {
+  const ta = document.createElement("textarea");
+  ta.value = text;
+  ta.style.position = "fixed";
+  ta.style.opacity = "0";
+  document.body.appendChild(ta);
+  ta.focus();
+  ta.select();
+  try { document.execCommand("copy"); } catch (e) {}
+  document.body.removeChild(ta);
+}
+
+// 轻量 toast 提示（自包含，无需改 CSS）
+function toast(msg) {
+  let t = document.getElementById("__toast");
+  if (!t) {
+    t = document.createElement("div");
+    t.id = "__toast";
+    t.style.cssText = "position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#222;color:#fff;padding:8px 16px;border-radius:8px;font-size:14px;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,.3);opacity:0;transition:opacity .2s;pointer-events:none;";
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  void t.offsetWidth; // 强制重绘，保证过渡可见
+  t.style.opacity = "1";
+  clearTimeout(toast._t);
+  toast._t = setTimeout(() => { t.style.opacity = "0"; }, 1300);
+}
+
 // ===== 本地持久化（localStorage）：刷新/关闭后再开数据不丢 =====
 const STORAGE_KEY = "price-calc-state-v1";
 
@@ -583,28 +663,12 @@ function renderSkc() {
       // 缩小且有剩余：显示「+N 更多」占位条（点击展开）
       if (items.length > limit) {
         const rest = items.length - limit;
-        html += '<button class="skc-more" type="button" id="skcMoreBtn" title="显示全部">+' + rest + ' 更多</button>';
+        html += '<button class="skc-more" type="button" title="显示全部">+' + rest + ' 更多</button>';
       }
     }
     html += "</div></div>";
   });
   board.innerHTML = html;
-
-  // 绑定删除按钮
-  board.querySelectorAll(".skc-del").forEach((btn) => {
-    btn.addEventListener("click", () => removeSkc(parseInt(btn.dataset.i, 10)));
-  });
-  // 绑定修改编码按钮 → 行内编辑
-  board.querySelectorAll(".skc-edit").forEach((btn) => {
-    btn.addEventListener("click", () => startEditSkc(parseInt(btn.dataset.i, 10)));
-  });
-  // 绑定「+N 更多」→ 直接放大
-  const moreBtn = document.getElementById("skcMoreBtn");
-  if (moreBtn) {
-    moreBtn.addEventListener("click", () => {
-      if (!skcExpanded) toggleSkcExpand();
-    });
-  }
 }
 
 // 简单转义，避免 SKC 文本破坏结构
@@ -706,6 +770,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (Date.now() - lastPointerDown <= POINTER_FOCUS_WINDOW) {
         inp.value = "";
         calculate();
+        pasteFromClipboard(inp);
       }
     });
   });
@@ -723,6 +788,28 @@ document.addEventListener("DOMContentLoaded", () => {
   document.getElementById("skcClearBtn").addEventListener("click", clearAllSkc);
   // SKC 放大/缩小切换
   document.getElementById("skcExpandBtn").addEventListener("click", toggleSkcExpand);
+  // SKC 面板按钮委托监听：删除 / 修改 / +N 更多
+  // 用委托可免疫 renderSkc() 频繁重绘导致的点击丢失/旧 listener 失效
+  document.getElementById("skcBoard").addEventListener("click", (e) => {
+    const moreBtn = e.target.closest(".skc-more");
+    if (moreBtn) {
+      e.preventDefault();
+      if (!skcExpanded) toggleSkcExpand();
+      return;
+    }
+    const editBtn = e.target.closest(".skc-edit");
+    if (editBtn) {
+      e.preventDefault();
+      startEditSkc(parseInt(editBtn.dataset.i, 10));
+      return;
+    }
+    const delBtn = e.target.closest(".skc-del");
+    if (delBtn) {
+      e.preventDefault();
+      removeSkc(parseInt(delBtn.dataset.i, 10));
+      return;
+    }
+  });
   // 历史：清空按钮
   document.getElementById("histClearBtn").addEventListener("click", clearHistory);
   loadState();        // 先恢复上次保存的输入/开关/SKC/历史
