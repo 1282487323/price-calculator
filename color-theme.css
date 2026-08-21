@@ -114,7 +114,7 @@
 [data-theme='color'] .field-pink::before   { background: var(--pink); }
 [data-theme='color'] .field input { background: #FAF7EF; border-radius: 9px; }
 [data-theme='color'] .field input:focus { box-shadow: var(--shadow-sm); background: #fff; border-color: var(--ink); }
-[data-theme='color'] .field:focus-within { transform: translate(6px, 6px); box-shadow: 0 0 0 var(--ink); border-color: var(--ink); }
+[data-theme='color'] .field:focus-within { transform: translate(4px, 4px); box-shadow: 0 0 0 var(--ink); border-color: var(--ink); }
 
 [data-theme='color'] .toggle-row { border-radius: 10px; }
 [data-theme='color'] .slider { border-radius: 30px; }
@@ -134,6 +134,10 @@
 [data-theme='color'] .tag-value.is-active { background: var(--lime); color: var(--ink); box-shadow: 3px 3px 0 var(--ink); }
 [data-theme='color'] .tag-piece { background: var(--lime); color: var(--ink); border-radius: 8px; }
 [data-theme='color'] .tag-piece.piece-second { background: var(--yellow); }
+
+[data-theme='color'] .rc-value.neg { background: var(--red); color: var(--white); }
+[data-theme='color'] .neg-prefix { color: var(--white); background: rgba(255, 255, 255, 0.2); border-color: var(--white); }
+[data-theme='color'] .rc-feature .rc-value.is-unavailable { background: var(--red); color: var(--white); }
 
 [data-theme='color'] .history-count { background: var(--ink); color: var(--yellow); border-radius: 5px; }
 [data-theme='color'] .history-item { background: var(--bg-cream); border-radius: 8px; border-left: 2px solid var(--ink); }
@@ -156,6 +160,11 @@
 [data-theme='color'] .skc-add-btn:hover { background: #d9b8ff; }
 [data-theme='color'] .btn-copy { background: var(--cyan); }
 [data-theme='color'] .btn-copy:hover { background: #9ee5f5; }
+
+/* SKC 行里的复制按钮：让 .skc-add-btn 的紫色背景不被 .btn-copy 覆盖 */
+[data-theme='color'] .btn-copy.skc-add-btn { background: var(--purple); color: var(--ink); }
+[data-theme='color'] .btn-copy.skc-add-btn:hover { background: #d9b8ff; }
+
 [data-theme='color'] .btn-clear { background: #ffd0d0; color: #a30000; border-color: #a30000; box-shadow: 3px 3px 0 #a30000; }
 [data-theme='color'] .btn-clear:hover { background: #ffd0d0; box-shadow: 4px 4px 0 #a30000; }
 [data-theme='color'] .btn-copy.is-flashed { background: var(--lime); }
@@ -172,12 +181,12 @@
 [data-theme='color'] .footer span:first-child::before { display: none; }
 
 /* 彩色主题：卡片 / 字段 hover 动效与蓝色版统一（朝阴影方向压近，仅配色不同） */
-[data-theme='color'] .result-card:hover { transform: translate(6px,6px); box-shadow: 0 0 0 var(--ink); }
-[data-theme='color'] .field:hover { transform: translate(6px,6px); box-shadow: 0 0 0 var(--ink); }
-[data-theme='color'] .rc-feature:hover { transform: translate(6px,6px); box-shadow: 0 0 0 var(--ink); }
-[data-theme='color'] .skc-col:hover { transform: translate(6px,6px); box-shadow: 0 0 0 var(--ink); border-top-color: var(--ink); }
-[data-theme='color'] .skc-chip:hover { transform: translate(2px,2px); box-shadow: 0 0 0 var(--ink); }
-[data-theme='color'] .toggle-row:hover { transform: translate(6px,6px); box-shadow: 0 0 0 var(--ink); }
-[data-theme='color'] .topbar:hover { transform: translate(10px,10px); box-shadow: 0 0 0 var(--ink); }
-[data-theme='color'] .panel:hover { transform: translate(10px,10px); box-shadow: 0 0 0 var(--ink); }
+[data-theme='color'] .result-card:hover { transform: translate(4px,4px); box-shadow: 0 0 0 var(--ink); }
+[data-theme='color'] .field:hover { transform: translate(4px,4px); box-shadow: 0 0 0 var(--ink); }
+[data-theme='color'] .rc-feature:hover { transform: translate(4px,4px); box-shadow: 0 0 0 var(--ink); }
+[data-theme='color'] .skc-col:hover { transform: translate(4px,4px); box-shadow: 0 0 0 var(--ink); border-top-color: var(--ink); }
+[data-theme='color'] .skc-chip:hover { transform: translate(1px,1px); box-shadow: 0 0 0 var(--ink); }
+[data-theme='color'] .toggle-row:hover { transform: translate(4px,4px); box-shadow: 0 0 0 var(--ink); }
+[data-theme='color'] .topbar:hover { transform: translate(6px,6px); box-shadow: 0 0 0 var(--ink); }
+[data-theme='color'] .panel:hover { transform: translate(6px,6px); box-shadow: 0 0 0 var(--ink); }
 [data-theme='color'] .logo { transition: transform .15s ease, box-shadow .12s ease; }
