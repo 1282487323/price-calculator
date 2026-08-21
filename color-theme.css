@@ -149,6 +149,11 @@
 [data-theme='color'] .footer { opacity: 0.7; }
 [data-theme='color'] .footer span:first-child::before { display: none; }
 
+/* 「减几」必填警示态（彩色版提权覆盖原 field 背景） */
+[data-theme='color'] .field-warn input { border: 2px solid #f59e0b; background: #FFF8EC; }
+[data-theme='color'] .field-warn input:focus { border: 2px solid #d97706; background: #FFF8EC; }
+[data-theme='color'] .field-warn .field-hint { color: #d97706; }
+
 /* 彩色主题：与蓝色版一致——容器不再位移，仅保留配色层面的悬停反馈 */
 [data-theme='color'] .skc-col:hover { border-top-color: var(--ink); }
 [data-theme='color'] .logo { transition: transform .15s ease, box-shadow .12s ease; }
