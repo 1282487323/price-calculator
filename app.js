@@ -713,6 +713,8 @@ document.addEventListener("DOMContentLoaded", () => {
   setInterval(updateClock, 1000);
   // PWA：注册 SW + 安装按钮逻辑
   initPwa();
+  // 主题切换（彩色 / 蓝色）
+  initTheme();
   // 打印前自动展开 SKC（确保全部编码都打印出来），打印后恢复原状
   let prevExpanded = null;
   window.addEventListener("beforeprint", () => {
@@ -795,5 +797,27 @@ function initPwa() {
       btn.disabled = false;
       deferredPrompt = null;
     }
+  });
+}
+
+/* =========================================================
+   主题切换：彩色版（Neobrutalism 多色） / 蓝色版（黑白+蓝强调）
+   - 初始主题由 <head> 内联脚本写入 <html data-theme>，避免首屏闪烁
+   - 选择持久化到 localStorage('pc_theme')，下次打开沿用
+   ========================================================= */
+function initTheme() {
+  const KEY = "pc_theme";
+  const btn = document.getElementById("themeBtn");
+  const getTheme = () => document.documentElement.getAttribute("data-theme") || "blue";
+  const applyBtn = () => {
+    if (btn) btn.textContent = getTheme() === "color" ? "蓝色版" : "彩色版";
+  };
+  applyBtn();
+  if (!btn) return;
+  btn.addEventListener("click", () => {
+    const next = getTheme() === "color" ? "blue" : "color";
+    document.documentElement.setAttribute("data-theme", next);
+    try { localStorage.setItem(KEY, next); } catch (e) {}
+    applyBtn();
   });
 }
