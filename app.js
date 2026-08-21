@@ -105,20 +105,18 @@ function toast(msg, ok = true) {
 }
 
 // 复制成功后，让「最终价格」数字卡片高亮闪一下（自包含，无需改 CSS）
+// 只用 box-shadow 光环描边，不动 background / color，避免数字与背景撞色或被覆盖
 function flashFinal() {
   const el = document.getElementById("out-b6");
   if (!el) return;
   const card = el.closest(".rc-feature") || el.parentElement;
   const target = card || el;
-  const prevBg = target.style.background;
-  const prevColor = target.style.color;
+  const prevBoxShadow = target.style.boxShadow;
   const prevTransition = target.style.transition;
-  target.style.transition = "background .15s, color .15s";
-  target.style.background = "var(--accent, #4d7cfe)";
-  target.style.color = "#fff";
+  target.style.transition = "box-shadow .15s";
+  target.style.boxShadow = "0 0 0 3px var(--accent, #4d7cfe), 0 0 16px var(--accent, #4d7cfe)";
   setTimeout(() => {
-    target.style.background = prevBg;
-    target.style.color = prevColor;
+    target.style.boxShadow = prevBoxShadow;
     target.style.transition = prevTransition;
   }, 650);
 }
