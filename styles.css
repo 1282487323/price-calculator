@@ -17,6 +17,7 @@
   --accent-dark: #1A4FC4;
   --accent-light: #EAF1FF;
   --accent-50: #F0F5FF;
+  --red: #ee5253;
 
   /* 彩色版调色板（仅彩色主题启用） */
   --yellow: #FFE14D;
@@ -73,10 +74,10 @@ body {
   border-radius: var(--radius);
   box-shadow: var(--shadow-lg);
   padding: 18px 24px;
-  transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease;
+  transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
 }
-.topbar:hover { transform: translate(10px, 10px); box-shadow: 0 0 0 var(--ink); }
-.topbar:active { transform: translate(10px, 10px); box-shadow: 0 0 0 var(--ink); }
+.topbar:hover { transform: translate(6px, 6px); box-shadow: 0 0 0 var(--ink); }
+.topbar:active { transform: translate(6px, 6px); box-shadow: 0 0 0 var(--ink); }
 
 .brand { display: flex; align-items: center; gap: 14px; }
 
@@ -153,11 +154,11 @@ body {
   padding: 10px 16px;
   background: var(--white);
   box-shadow: var(--shadow-sm);
-  transition: transform .08s ease, box-shadow .08s ease, background .12s ease;
+  transition: transform .16s ease, box-shadow .16s ease, background .12s ease;
   color: var(--ink);
 }
-.btn:hover { transform: translate(6px, 6px); box-shadow: 0 0 0 var(--ink); }
-.btn:active { transform: translate(6px, 6px); box-shadow: 0 0 0 var(--ink); }
+.btn:hover { transform: translate(4px, 4px); box-shadow: 0 0 0 var(--ink); }
+.btn:active { transform: translate(4px, 4px); box-shadow: 0 0 0 var(--ink); }
 
 .btn-ghost { background: var(--light-gray); }
 .btn-ghost:hover { background: var(--ink); color: var(--white); }
@@ -171,7 +172,7 @@ body {
 .btn-install:hover {
   background: var(--accent-dark);
   color: var(--white);
-  transform: translate(6px, 6px);
+  transform: translate(4px, 4px);
   box-shadow: 0 0 0 var(--ink);
 }
 @keyframes install-pulse {
@@ -193,7 +194,7 @@ body {
 .btn-calc:hover {
   background: var(--accent-dark);
   color: var(--white);
-  transform: translate(6px, 6px);
+  transform: translate(4px, 4px);
   box-shadow: 0 0 0 var(--ink);
 }
 
@@ -215,11 +216,11 @@ body {
   border-radius: var(--radius);
   box-shadow: var(--shadow-lg);
   padding: 24px;
-  transition: transform .12s ease, box-shadow .12s ease;
+  transition: transform .25s ease, box-shadow .25s ease;
   position: relative;
 }
-.panel:hover { transform: translate(10px, 10px); box-shadow: 0 0 0 var(--ink); }
-.panel:active { transform: translate(10px, 10px); box-shadow: 0 0 0 var(--ink); }
+.panel:hover { transform: translate(6px, 6px); box-shadow: 0 0 0 var(--ink); }
+.panel:active { transform: translate(6px, 6px); box-shadow: 0 0 0 var(--ink); }
 
 /* 面板左侧蓝色竖线 */
 .panel::before {
@@ -271,11 +272,11 @@ body {
   background: var(--white);
   box-shadow: var(--shadow-sm);
   position: relative;
-  transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease;
+  transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
 }
-.field:hover { transform: translate(6px, 6px); box-shadow: 0 0 0 var(--ink); }
+.field:hover { transform: translate(4px, 4px); box-shadow: 0 0 0 var(--ink); }
 .field:focus-within {
-  transform: translate(6px, 6px);
+  transform: translate(4px, 4px);
   box-shadow: 0 0 0 var(--accent);
   border-color: var(--accent);
 }
@@ -327,10 +328,10 @@ body {
   border: var(--border);
   border-radius: var(--radius);
   box-shadow: var(--shadow-sm);
-  transition: transform .12s ease, box-shadow .12s ease;
+  transition: transform .25s ease, box-shadow .25s ease;
 }
-.toggle-row:hover { transform: translate(6px, 6px); box-shadow: 0 0 0 var(--ink); }
-.toggle-row:active { transform: translate(6px, 6px); box-shadow: 0 0 0 var(--ink); }
+.toggle-row:hover { transform: translate(4px, 4px); box-shadow: 0 0 0 var(--ink); }
+.toggle-row:active { transform: translate(4px, 4px); box-shadow: 0 0 0 var(--ink); }
 .toggle-label { font-family: "Noto Sans SC", sans-serif; font-weight: 700; font-size: 14px; line-height: 1.4; }
 .switch { position: relative; display: inline-block; width: 56px; height: 28px; flex-shrink: 0; }
 .switch input { opacity: 0; width: 0; height: 0; }
@@ -370,7 +371,7 @@ body {
   gap: 10px;
   min-height: 110px;
   justify-content: center;
-  transition: transform .12s ease, box-shadow .12s ease, border-color .12s ease;
+  transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
   background: var(--white);
   position: relative;
 }
@@ -383,15 +384,15 @@ body {
   transition: background .15s ease;
 }
 .result-card:hover {
-  transform: translate(6px, 6px);
+  transform: translate(4px, 4px);
   box-shadow: 0 0 0 var(--ink);
 }
 .result-card:hover::before { background: var(--accent); }
 .result-card:active {
-  transform: translate(6px, 6px);
+  transform: translate(4px, 4px);
   box-shadow: 0 0 0 var(--ink);
 }
-.result-card:focus-within { border-color: var(--accent); transform: translate(6px, 6px); box-shadow: 0 0 0 var(--accent); }
+.result-card:focus-within { border-color: var(--accent); transform: translate(4px, 4px); box-shadow: 0 0 0 var(--accent); }
 
 /* 重点输出卡：跨两列 */
 .rc-feature { grid-column: 1 / -1; padding: 20px 22px; }
@@ -405,7 +406,7 @@ body {
 .rc-feature-tall .tag-value { font-size: 34px; padding: 5px 14px; }
 .rc-feature-short .tag-value { font-size: 28px; padding: 4px 12px; }
 .rc-feature:hover {
-  transform: translate(6px, 6px);
+  transform: translate(4px, 4px);
   box-shadow: 0 0 0 var(--accent);
 }
 .rc-feature:hover::before { background: var(--accent-dark); }
@@ -499,20 +500,38 @@ body {
   box-shadow: 0 0 0 2px var(--white), 0 0 0 4px var(--ink);
 }
 
-/* 差价为负 */
-.rc-value.neg { color: var(--ink); }
+/* 差价为负：红底白字 + 放大字号，醒目提示亏损 */
+.rc-value.neg {
+  display: inline-block;
+  background: var(--red);
+  color: var(--white);
+  font-size: 34px;
+  padding: 6px 14px;
+  border-radius: var(--radius);
+}
 .neg-prefix {
   display: inline-block;
-  font-family: "Space Grotesk", sans-serif;
-  font-size: 12px;
+  font-family: "Space Grotesk", "Noto Sans SC", sans-serif;
+  font-size: 14px;
   font-weight: 700;
-  color: var(--ink);
-  background: var(--white);
-  border: 2px solid var(--ink);
+  color: var(--white);
+  background: rgba(255, 255, 255, 0.18);
+  border: 2px solid var(--white);
   border-radius: var(--radius);
-  padding: 1px 6px;
-  margin-right: 6px;
+  padding: 2px 8px;
+  margin-right: 8px;
   vertical-align: middle;
+}
+
+/* 差价低于原定价：最终报活动卡片标红显示「此商品不可用」 */
+.rc-value.is-unavailable {
+  display: inline-block;
+  background: var(--red);
+  color: var(--white);
+  font-weight: 700;
+  font-size: 24px;
+  padding: 4px 14px;
+  border-radius: var(--radius);
 }
 
 /* ===== 计算逻辑 ===== */
@@ -589,10 +608,10 @@ body {
   padding: 4px 10px;
   cursor: pointer;
   box-shadow: 2px 2px 0 var(--ink);
-  transition: transform .08s, box-shadow .08s;
+  transition: transform .14s, box-shadow .14s;
 }
-.history-clear:hover { transform: translate(2px, 2px); box-shadow: 0 0 0 var(--ink); }
-.history-clear:active { transform: translate(2px, 2px); box-shadow: 0 0 0 var(--ink); }
+.history-clear:hover { transform: translate(1px, 1px); box-shadow: 0 0 0 var(--ink); }
+.history-clear:active { transform: translate(1px, 1px); box-shadow: 0 0 0 var(--ink); }
 
 .history-list {
   display: flex;
@@ -632,10 +651,10 @@ body {
   padding: 8px 10px;
   box-shadow: 2px 2px 0 var(--ink);
   font-size: 13px;
-  transition: transform .1s, box-shadow .1s, border-left-color .1s;
+  transition: transform .2s, box-shadow .2s, border-left-color .2s;
 }
 .history-item:hover {
-  transform: translate(6px, 6px);
+  transform: translate(4px, 4px);
   box-shadow: 0 0 0 var(--ink);
   border-left-color: var(--accent-dark);
 }
@@ -715,7 +734,7 @@ body {
   padding: 3px 8px;
   cursor: pointer;
   line-height: 1.1;
-  transition: transform .08s, box-shadow .08s;
+  transition: transform .14s, box-shadow .14s;
 }
 .hi-fill {
   background: var(--accent);
@@ -723,8 +742,8 @@ body {
   border-color: var(--accent);
   box-shadow: 1px 1px 0 var(--ink);
 }
-.hi-fill:hover { transform: translate(2px, 2px); box-shadow: 0 0 0 var(--ink); background: var(--accent-dark); }
-.hi-fill:active { transform: translate(2px, 2px); box-shadow: 0 0 0 var(--ink); }
+.hi-fill:hover { transform: translate(1px, 1px); box-shadow: 0 0 0 var(--ink); background: var(--accent-dark); }
+.hi-fill:active { transform: translate(1px, 1px); box-shadow: 0 0 0 var(--ink); }
 .hi-del {
   background: var(--white);
   color: var(--ink);
@@ -734,7 +753,7 @@ body {
   font-size: 13px;
   box-shadow: 1px 1px 0 var(--ink);
 }
-.hi-del:hover { transform: translate(2px, 2px) rotate(90deg) scale(1.1); box-shadow: 0 0 0 var(--ink); }
+.hi-del:hover { transform: translate(1px, 1px) rotate(90deg) scale(1.1); box-shadow: 0 0 0 var(--ink); }
 
 @keyframes hist-in {
   0%   { transform: translateX(-10px); opacity: 0; }
@@ -802,6 +821,10 @@ body {
 .btn-copy { background: var(--light-gray); }
 .btn-copy:hover { background: var(--ink); color: var(--white); }
 
+/* SKC 行里的复制按钮：让 .skc-add-btn 的蓝色背景不被 .btn-copy 覆盖，保持白字醒目 */
+.btn-copy.skc-add-btn { background: var(--accent); color: var(--white); }
+.btn-copy.skc-add-btn:hover { background: var(--accent-dark); color: var(--white); }
+
 .btn-clear {
   background: var(--white);
   color: var(--ink);
@@ -811,7 +834,7 @@ body {
 .btn-clear:hover {
   background: var(--ink);
   color: var(--white);
-  transform: translate(6px, 6px);
+  transform: translate(4px, 4px);
   box-shadow: 0 0 0 var(--ink);
 }
 .btn-copy.is-flashed {
@@ -849,16 +872,16 @@ body {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  transition: transform .12s ease, box-shadow .12s ease;
+  transition: transform .25s ease, box-shadow .25s ease;
   border-top: 4px solid var(--accent);
 }
 .skc-col:hover {
-  transform: translate(6px, 6px);
+  transform: translate(4px, 4px);
   box-shadow: 0 0 0 var(--accent);
   border-top-color: var(--accent-dark);
 }
 .skc-col:active {
-  transform: translate(6px, 6px);
+  transform: translate(4px, 4px);
   box-shadow: 0 0 0 var(--accent);
 }
 .skc-col-head {
@@ -904,10 +927,10 @@ body {
   border-radius: var(--radius);
   padding: 6px 10px;
   cursor: pointer;
-  transition: transform 0.08s ease, box-shadow 0.08s ease, background .12s;
+  transition: transform .14s ease, box-shadow .14s ease, background .12s;
 }
 .skc-more:hover {
-  transform: translate(2px, 2px);
+  transform: translate(1px, 1px);
   box-shadow: 0 0 0 var(--accent);
   background: var(--accent);
   color: var(--white);
@@ -922,14 +945,14 @@ body {
   border-radius: var(--radius);
   padding: 7px 9px;
   font-size: 13px;
-  transition: transform .12s ease, box-shadow .12s ease;
+  transition: transform .2s ease, box-shadow .2s ease;
 }
 .skc-chip:hover {
-  transform: translate(2px, 2px);
+  transform: translate(1px, 1px);
   box-shadow: 0 0 0 var(--ink);
 }
 .skc-chip:active {
-  transform: translate(2px, 2px);
+  transform: translate(1px, 1px);
   box-shadow: 0 0 0 var(--ink);
 }
 .skc-code {
