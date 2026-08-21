@@ -65,8 +65,12 @@ async function copyFinalPrice() {
     } else {
       legacyCopy(text);
     }
-    toast("已复制最终价格：" + text);
-  } catch (e) { /* 复制被拦截，静默 */ }
+    toast("✓ 已复制最终价格：" + text);
+    flashFinal();
+  } catch (e) {
+    // 复制被拦截（如非安全上下文 / 无手势）：给出红色提示而非无反应
+    toast("⚠ 复制失败，请手动复制（Ctrl+C）", false);
+  }
 }
 
 // 兼容性兜底：老浏览器无 Clipboard API 时用 execCommand 复制
@@ -82,20 +86,41 @@ function legacyCopy(text) {
   document.body.removeChild(ta);
 }
 
-// 轻量 toast 提示（自包含，无需改 CSS）
-function toast(msg) {
+// 轻量 toast 提示（自包含，无需改 CSS）：顶部居中、彩色、更明显
+function toast(msg, ok = true) {
   let t = document.getElementById("__toast");
   if (!t) {
     t = document.createElement("div");
     t.id = "__toast";
-    t.style.cssText = "position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#222;color:#fff;padding:8px 16px;border-radius:8px;font-size:14px;z-index:9999;box-shadow:0 4px 12px rgba(0,0,0,.3);opacity:0;transition:opacity .2s;pointer-events:none;";
+    t.style.cssText = "position:fixed;left:50%;top:18px;transform:translateX(-50%) translateY(-8px);background:#10b981;color:#fff;padding:10px 18px;border-radius:10px;font-size:15px;font-weight:600;z-index:9999;box-shadow:0 6px 18px rgba(0,0,0,.25);opacity:0;transition:opacity .2s, transform .2s;pointer-events:none;";
     document.body.appendChild(t);
   }
   t.textContent = msg;
+  t.style.background = ok ? "#10b981" : "#ee5253";
   void t.offsetWidth; // 强制重绘，保证过渡可见
   t.style.opacity = "1";
+  t.style.transform = "translateX(-50%) translateY(0)";
   clearTimeout(toast._t);
-  toast._t = setTimeout(() => { t.style.opacity = "0"; }, 1300);
+  toast._t = setTimeout(() => { t.style.opacity = "0"; }, 1800);
+}
+
+// 复制成功后，让「最终价格」数字卡片高亮闪一下（自包含，无需改 CSS）
+function flashFinal() {
+  const el = document.getElementById("out-b6");
+  if (!el) return;
+  const card = el.closest(".rc-feature") || el.parentElement;
+  const target = card || el;
+  const prevBg = target.style.background;
+  const prevColor = target.style.color;
+  const prevTransition = target.style.transition;
+  target.style.transition = "background .15s, color .15s";
+  target.style.background = "var(--accent, #4d7cfe)";
+  target.style.color = "#fff";
+  setTimeout(() => {
+    target.style.background = prevBg;
+    target.style.color = prevColor;
+    target.style.transition = prevTransition;
+  }, 650);
 }
 
 // ===== 本地持久化（localStorage）：刷新/关闭后再开数据不丢 =====
