@@ -1030,3 +1030,17 @@ body {
   /* 打印强制方角，无视主题圆角 */
   * { border-radius: 0 !important; }
 }
+
+/* ===== 「减几」必填警示态（网关锁死时） ===== */
+.field-warn input {
+  border-color: #f59e0b;
+  background: #FFF8EC;
+}
+.field-warn input:focus {
+  border-color: #d97706;
+  background: #FFF8EC;
+}
+.field-warn .field-hint {
+  color: #d97706;
+  font-weight: 700;
+}
