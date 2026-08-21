@@ -7,7 +7,7 @@
   --light-gray: #E8E8E8;
   --mid-gray: #BBBBBB;
   --muted: #888888;
-  --bg: var(--bg);            /* 主题背景，彩色主题覆盖为米黄 */
+  --bg: #F5F6F8;            /* 主题背景，彩色主题覆盖为米黄 */
 
   /* 主题圆角：蓝色版方角(0)，彩色版圆角(14px) */
   --radius: 0px;
@@ -31,11 +31,11 @@
   --border: 2px solid var(--ink);
   --border-thick: 3px solid var(--ink);
   --border-accent: 2px solid var(--accent);
-  --shadow: 4px 4px 0 var(--ink);
-  --shadow-sm: 6px 6px 0 var(--ink);
-  --shadow-lg: 10px 10px 0 var(--ink);
-  --shadow-accent: 4px 4px 0 var(--accent);
-  --shadow-accent-sm: 6px 6px 0 var(--accent);
+  --shadow: 3px 3px 0 var(--ink);
+  --shadow-sm: 4px 4px 0 var(--ink);
+  --shadow-lg: 6px 6px 0 var(--ink);
+  --shadow-accent: 3px 3px 0 var(--accent);
+  --shadow-accent-sm: 4px 4px 0 var(--accent);
 }
 
 /* 装饰元素默认隐藏（仅彩色主题显示） */
@@ -46,7 +46,7 @@
 html { scroll-behavior: smooth; }
 
 body {
-  font-family: "Space Grotesk", "Noto Sans SC", system-ui, sans-serif;
+  font-family: "Space Grotesk", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background: var(--bg);
@@ -67,17 +67,15 @@ body {
   justify-content: space-between;
   gap: 16px;
   max-width: 1180px;
-  margin: 0 auto 28px;
+  margin: 0 auto 24px;
   background: var(--white);
   border: none;
-  border-top: 5px solid var(--accent);
+  border-top: 5px solid transparent;
   border-radius: var(--radius);
-  box-shadow: var(--shadow-lg);
-  padding: 18px 24px;
-  transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+  box-shadow: var(--shadow-sm);
+  padding: 14px 20px;
+  transition: box-shadow .25s ease, border-color .25s ease;
 }
-.topbar:hover { transform: translate(6px, 6px); box-shadow: 0 0 0 var(--ink); }
-.topbar:active { transform: translate(6px, 6px); box-shadow: 0 0 0 var(--ink); }
 
 .brand { display: flex; align-items: center; gap: 14px; }
 
@@ -115,30 +113,27 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
-  padding: 8px 20px;
+  gap: 2px;
+  padding: 6px 14px;
   background: var(--white);
   border: none;
   border-radius: var(--radius);
-  box-shadow: var(--shadow-sm);
-  min-width: 190px;
-  transition: box-shadow .12s ease;
+  min-width: 150px;
 }
-.clock:hover { box-shadow: 5px 5px 0 var(--accent); }
 .clock-date {
   font-family: "Space Grotesk", "Noto Sans SC", sans-serif;
-  font-size: 15px;
+  font-size: 13px;
   font-weight: 700;
   color: var(--ink);
   letter-spacing: 1px;
   line-height: 1;
 }
 .clock-time {
-  font-family: "Oswald", "Space Grotesk", monospace;
-  font-size: 34px;
+  font-family: "Space Grotesk", "Noto Sans SC", monospace;
+  font-size: 26px;
   font-weight: 700;
   color: var(--accent);
-  letter-spacing: 1.5px;
+  letter-spacing: 1px;
   line-height: 1;
   font-variant-numeric: tabular-nums;
 }
@@ -214,28 +209,17 @@ body {
   background: var(--white);
   border: none;
   border-radius: var(--radius);
-  box-shadow: var(--shadow-lg);
+  box-shadow: var(--shadow-sm);
   padding: 24px;
   transition: transform .25s ease, box-shadow .25s ease;
   position: relative;
-}
-.panel:hover { transform: translate(6px, 6px); box-shadow: 0 0 0 var(--ink); }
-.panel:active { transform: translate(6px, 6px); box-shadow: 0 0 0 var(--ink); }
-
-/* 面板左侧蓝色竖线 */
-.panel::before {
-  content: "";
-  position: absolute;
-  left: 0; top: 0; bottom: 0;
-  width: 5px;
-  background: var(--accent);
 }
 
 .panel-head {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 3px solid var(--accent);
+  border-bottom: 2px solid var(--light-gray);
   padding-bottom: 14px;
   margin-bottom: 20px;
 }
@@ -270,11 +254,10 @@ body {
   border-radius: var(--radius);
   padding: 14px;
   background: var(--white);
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow);
   position: relative;
   transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
 }
-.field:hover { transform: translate(4px, 4px); box-shadow: 0 0 0 var(--ink); }
 .field:focus-within {
   transform: translate(4px, 4px);
   box-shadow: 0 0 0 var(--accent);
@@ -327,11 +310,8 @@ body {
   background: var(--white);
   border: var(--border);
   border-radius: var(--radius);
-  box-shadow: var(--shadow-sm);
   transition: transform .25s ease, box-shadow .25s ease;
 }
-.toggle-row:hover { transform: translate(4px, 4px); box-shadow: 0 0 0 var(--ink); }
-.toggle-row:active { transform: translate(4px, 4px); box-shadow: 0 0 0 var(--ink); }
 .toggle-label { font-family: "Noto Sans SC", sans-serif; font-weight: 700; font-size: 14px; line-height: 1.4; }
 .switch { position: relative; display: inline-block; width: 56px; height: 28px; flex-shrink: 0; }
 .switch input { opacity: 0; width: 0; height: 0; }
@@ -364,14 +344,14 @@ body {
 .result-card {
   border: none;
   border-radius: var(--radius);
-  padding: 16px;
-  box-shadow: var(--shadow-sm);
+  padding: 14px;
+  box-shadow: var(--shadow);
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
   min-height: 110px;
   justify-content: center;
-  transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+  transition: box-shadow .25s ease, border-color .25s ease;
   background: var(--white);
   position: relative;
 }
@@ -383,16 +363,7 @@ body {
   background: var(--light-gray);
   transition: background .15s ease;
 }
-.result-card:hover {
-  transform: translate(4px, 4px);
-  box-shadow: 0 0 0 var(--ink);
-}
 .result-card:hover::before { background: var(--accent); }
-.result-card:active {
-  transform: translate(4px, 4px);
-  box-shadow: 0 0 0 var(--ink);
-}
-.result-card:focus-within { border-color: var(--accent); transform: translate(4px, 4px); box-shadow: 0 0 0 var(--accent); }
 
 /* 重点输出卡：跨两列 */
 .rc-feature { grid-column: 1 / -1; padding: 20px 22px; }
@@ -405,10 +376,6 @@ body {
 .rc-feature-short .rc-value { font-size: 36px; }
 .rc-feature-tall .tag-value { font-size: 34px; padding: 5px 14px; }
 .rc-feature-short .tag-value { font-size: 28px; padding: 4px 12px; }
-.rc-feature:hover {
-  transform: translate(4px, 4px);
-  box-shadow: 0 0 0 var(--accent);
-}
 .rc-feature:hover::before { background: var(--accent-dark); }
 
 .rc-label {
@@ -418,10 +385,10 @@ body {
   line-height: 1.3;
 }
 .rc-value {
-  font-family: "Oswald", "Space Grotesk", sans-serif;
+  font-family: "Space Grotesk", "Noto Sans SC", sans-serif;
   font-size: 30px;
-  font-weight: 500;
-  letter-spacing: 0.5px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
   line-height: 1.1;
   word-break: break-all;
 }
@@ -448,7 +415,6 @@ body {
   background: var(--accent);
   color: var(--white);
   border-color: var(--accent);
-  box-shadow: var(--shadow-sm);
 }
 /* 报活动时：拆分两段 */
 .tag-value.is-active.is-split {
@@ -479,18 +445,12 @@ body {
 .tag-slash {
   display: inline-flex;
   align-items: center;
-  align-self: stretch;
   font-family: "Oswald", "Space Grotesk", sans-serif;
   font-weight: 700;
   font-size: 0.85em;
-  background: transparent;
   color: var(--ink);
-  padding: 0 4px;
-  margin: 0 -2px;
+  margin: 0 4px;
   line-height: 1;
-  letter-spacing: -0.5px;
-  position: relative;
-  z-index: 1;
 }
 .tag-value.is-none {
   background: var(--ink);
@@ -559,7 +519,7 @@ body {
   line-height: 1.9;
   font-size: 14px;
 }
-.logic-list b { background: var(--accent-light); padding: 1px 6px; border-radius: var(--radius); border: 1px solid var(--accent); color: var(--accent-dark); }
+.logic-list b { color: var(--accent-dark); }
 
 /* ===== 底部显示选项卡片 ===== */
 .panel-toggles {
@@ -646,7 +606,7 @@ body {
   gap: 10px;
   background: var(--white);
   border: 2px solid var(--ink);
-  border-left: 4px solid var(--accent);
+  border-left: 4px solid var(--light-gray);
   border-radius: var(--radius);
   padding: 8px 10px;
   box-shadow: 2px 2px 0 var(--ink);
@@ -654,8 +614,6 @@ body {
   transition: transform .2s, box-shadow .2s, border-left-color .2s;
 }
 .history-item:hover {
-  transform: translate(4px, 4px);
-  box-shadow: 0 0 0 var(--ink);
   border-left-color: var(--accent-dark);
 }
 .hi-time {
@@ -873,16 +831,10 @@ body {
   flex-direction: column;
   overflow: hidden;
   transition: transform .25s ease, box-shadow .25s ease;
-  border-top: 4px solid var(--accent);
+  border-top: 4px solid var(--light-gray);
 }
 .skc-col:hover {
-  transform: translate(4px, 4px);
-  box-shadow: 0 0 0 var(--accent);
   border-top-color: var(--accent-dark);
-}
-.skc-col:active {
-  transform: translate(4px, 4px);
-  box-shadow: 0 0 0 var(--accent);
 }
 .skc-col-head {
   font-family: "Noto Sans SC", sans-serif;
@@ -941,19 +893,11 @@ body {
   gap: 8px;
   background: var(--white);
   border: 2px solid var(--ink);
-  border-left: 3px solid var(--accent);
+  border-left: 3px solid var(--light-gray);
   border-radius: var(--radius);
   padding: 7px 9px;
   font-size: 13px;
   transition: transform .2s ease, box-shadow .2s ease;
-}
-.skc-chip:hover {
-  transform: translate(1px, 1px);
-  box-shadow: 0 0 0 var(--ink);
-}
-.skc-chip:active {
-  transform: translate(1px, 1px);
-  box-shadow: 0 0 0 var(--ink);
 }
 .skc-code {
   font-family: "Space Grotesk", "Noto Sans SC", monospace;
