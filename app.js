@@ -678,13 +678,23 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     });
   });
-  // 仅「输入价格」和「原定价」每次 focus 自动清空
+  // 仅「输入价格」和「原定价」在真正点击/触摸字段后获得焦点时自动清空
+  // 避免窗口切换回来时浏览器自动聚焦导致误清空
   ["in-price", "in-origin"].forEach((id) => {
     const inp = document.getElementById(id);
     if (!inp) return;
+    const field = inp.closest(".field");
+    if (!field) return;
+    let lastPointerDown = 0;
+    const POINTER_FOCUS_WINDOW = 300; // ms
+    field.addEventListener("pointerdown", () => { lastPointerDown = Date.now(); });
+    // 兼容不支持 pointerdown 的旧浏览器
+    field.addEventListener("mousedown", () => { lastPointerDown = Date.now(); });
     inp.addEventListener("focus", () => {
-      inp.value = "";
-      calculate();
+      if (Date.now() - lastPointerDown <= POINTER_FOCUS_WINDOW) {
+        inp.value = "";
+        calculate();
+      }
     });
   });
   // 显隐开关
