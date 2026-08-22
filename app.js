@@ -898,7 +898,6 @@ document.addEventListener("DOMContentLoaded", () => {
   // 立即计算：算 + 入历史（每次点击都新增一条，相同参数也计入）
   document.getElementById("calcBtn").addEventListener("click", () => calculate(true));
   document.getElementById("resetBtn").addEventListener("click", resetDefaults);
-  document.getElementById("printBtn").addEventListener("click", () => window.print());
   // 实时输入：只算，不入历史（避免试算过程的中间态污染历史）
   // 任意输入框按回车 = 立即计算（入历史）
   document.querySelectorAll(".field input").forEach((inp) => {
@@ -999,19 +998,6 @@ document.addEventListener("DOMContentLoaded", () => {
   initPwa();
   // 主题切换（彩色 / 蓝色）
   initTheme();
-  // 打印前自动展开 SKC（确保全部编码都打印出来），打印后恢复原状
-  let prevExpanded = null;
-  window.addEventListener("beforeprint", () => {
-    prevExpanded = skcExpanded;
-    if (!skcExpanded) { skcExpanded = true; renderSkc(); }
-  });
-  window.addEventListener("afterprint", () => {
-    if (prevExpanded !== null && prevExpanded !== skcExpanded) {
-      skcExpanded = prevExpanded;
-      renderSkc();
-    }
-    prevExpanded = null;
-  });
 });
 
 /* =========================================================
