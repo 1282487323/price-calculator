@@ -7,6 +7,8 @@
 [data-theme='color'] {
   --bg: var(--bg-cream);
   --radius: 14px;
+  /* 让 JS 闪烁光环（flashFinal 用 var(--accent)）跟随彩色主题，而非回退到蓝色兜底值 */
+  --accent: var(--lime);
 }
 
 /* 装饰元素：彩色主题下显示 */
@@ -92,7 +94,6 @@
 
 [data-theme='color'] .result-card { border-radius: 12px; background: var(--white); }
 /* 结果卡改为白底 + 彩色左边条，降低高饱和铺色带来的杂乱感 */
-[data-theme='color'] .result-card::before { background: var(--ink); }
 [data-theme='color'] .rc-yellow::before { background: var(--yellow); }
 [data-theme='color'] .rc-cyan::before { background: var(--cyan); }
 [data-theme='color'] .rc-lime::before { background: var(--lime); }
