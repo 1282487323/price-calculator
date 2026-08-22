@@ -178,7 +178,7 @@ function flashFinal() {
   const prevBoxShadow = target.style.boxShadow;
   const prevTransition = target.style.transition;
   target.style.transition = "box-shadow .15s";
-  target.style.boxShadow = "0 0 0 3px var(--accent, #4d7cfe), 0 0 16px var(--accent, #4d7cfe)";
+  target.style.boxShadow = "0 0 0 3px var(--accent, #2568EF), 0 0 16px var(--accent, #2568EF)";
   setTimeout(() => {
     target.style.boxShadow = prevBoxShadow;
     target.style.transition = prevTransition;
