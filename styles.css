@@ -995,42 +995,6 @@ body {
   .topbar-actions { text-align: right; }
 }
 
-/* ===== 打印友好视图 ===== */
-@media print {
-  .topbar-actions, .skc-add, .skc-hint,
-  .skc-edit, .skc-del, .skc-more,
-  .install-pulse, .footer, .clock { display: none !important; }
-
-  html, body {
-    background: #fff !important;
-    color: #000 !important;
-    background-image: none !important;
-  }
-  body { padding: 0 !important; }
-  .layout { display: block !important; }
-  .panel {
-    box-shadow: none !important;
-    border: 1px solid #000 !important;
-    border-radius: var(--radius) !important;
-    margin-bottom: 14px !important;
-    break-inside: avoid;
-  }
-  .panel::before { display: none !important; }
-  .panel-head { border-bottom: 2px solid #000 !important; }
-  .panel-head h2 { font-size: 16px !important; }
-  .rc-feature { box-shadow: none !important; }
-  .rc-feature::before { display: none !important; }
-  .result-card::before { display: none !important; }
-  .skc-board { grid-template-columns: repeat(4, 1fr) !important; gap: 8px !important; }
-  .skc-col { box-shadow: none !important; border: 1px solid #000 !important; border-radius: var(--radius) !important; border-top: 2px solid #000 !important; }
-  .skc-chip { box-shadow: none !important; border: 1px solid #999 !important; border-left: 2px solid #999 !important; }
-  .skc-price { background: #eee !important; color: #000 !important; border-color: #999 !important; }
-  * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-  @page { margin: 12mm; }
-  /* 打印强制方角，无视主题圆角 */
-  * { border-radius: 0 !important; }
-}
-
 /* ===== 「减几」必填警示态（网关锁死时） ===== */
 .field-warn input {
   border-color: #f59e0b;
